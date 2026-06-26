@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.db.database import engine
+from app.db.database import Base, engine
+from app import models
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Loyalty SaaS API",
