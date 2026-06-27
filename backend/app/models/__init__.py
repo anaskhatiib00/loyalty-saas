@@ -6,3 +6,4 @@ from app.models.transaction import Transaction
 from app.models.reward import Reward
 from app.models.location import Location
 from app.models.loyalty_program import LoyaltyProgram
+from app.models.progress_ledger import ProgressLedger

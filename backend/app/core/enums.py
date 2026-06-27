@@ -33,3 +33,15 @@ class RedemptionBehavior(str, Enum):
 class RedemptionMode(str, Enum):
     MANUAL = "manual"
     CUSTOMER_CHOICE = "customer_choice"
+
+
+class LedgerEntryType(str, Enum):
+    PURCHASE = "purchase"
+    BONUS = "bonus"
+    REDEMPTION = "redemption"
+    REFUND = "refund"
+    ADJUSTMENT = "adjustment"
+    CAMPAIGN = "campaign"
+    WELCOME = "welcome"
+    BIRTHDAY = "birthday"
+    REFERRAL = "referral"
