@@ -1,15 +1,14 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.db.database import Base, engine
-from app import models
-
 from app.api.v1.auth import router as auth_router
 from app.api.v1.business import router as business_router
 
+from app.db.database import engine
+
 from app.api.v1.location import router as location_router
 
-Base.metadata.create_all(bind=engine)
+#Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Loyalty SaaS API",
