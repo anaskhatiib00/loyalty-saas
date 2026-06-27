@@ -17,7 +17,7 @@ class Reward(Base):
 
     reward_type = Column(String, default="discount")  # discount, free_item, cashback, custom
     reward_value = Column(String, nullable=True)
-
+    redemption_behavior = Column(String, default="deduct")
     is_active = Column(Boolean, default=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

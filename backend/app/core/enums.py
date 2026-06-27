@@ -21,3 +21,10 @@ class RewardType(str, Enum):
     FREE_ITEM = "free_item"
     CASHBACK = "cashback"
     CUSTOM = "custom"
+
+
+class RedemptionBehavior(str, Enum):
+    RESET = "reset"
+    DEDUCT = "deduct"
+    CARRY_OVER = "carry_over"
+    KEEP = "keep"
