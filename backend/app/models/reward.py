@@ -13,7 +13,7 @@ class Reward(Base):
 
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    points_required = Column(Integer, nullable=False)
+    required_value = Column(Integer, nullable=False)
 
     reward_type = Column(String, default="discount")  # discount, free_item, cashback, custom
     reward_value = Column(String, nullable=True)
