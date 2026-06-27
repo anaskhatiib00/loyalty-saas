@@ -29,3 +29,9 @@ class LoyaltyProgram(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     business = relationship("Business", back_populates="loyalty_program")
+
+    program_type = Column(String, default="points")
+    earn_unit = Column(String, default="currency")
+    earn_rate = Column(Float, default=1.0)
+    target_count = Column(Integer, nullable=True)
+    target_reward_description = Column(String, nullable=True)

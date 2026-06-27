@@ -14,6 +14,11 @@ class LoyaltyProgramCreate(BaseModel):
     points_expire: bool = False
     expiration_months: Optional[int] = None
     is_active: bool = True
+    program_type: str = "points"
+    earn_unit: str = "currency"
+    earn_rate: float = 1.0
+    target_count: Optional[int] = None
+    target_reward_description: Optional[str] = None
 
 
 class LoyaltyProgramUpdate(BaseModel):
@@ -27,6 +32,11 @@ class LoyaltyProgramUpdate(BaseModel):
     points_expire: Optional[bool] = None
     expiration_months: Optional[int] = None
     is_active: Optional[bool] = None
+    program_type: Optional[str] = None
+    earn_unit: Optional[str] = None
+    earn_rate: Optional[float] = None
+    target_count: Optional[int] = None
+    target_reward_description: Optional[str] = None
 
 
 class LoyaltyProgramResponse(BaseModel):
@@ -42,6 +52,11 @@ class LoyaltyProgramResponse(BaseModel):
     points_expire: bool
     expiration_months: Optional[int]
     is_active: bool
+    program_type: str
+    earn_unit: str
+    earn_rate: float
+    target_count: Optional[int]
+    target_reward_description: Optional[str]
 
     class Config:
         from_attributes = True

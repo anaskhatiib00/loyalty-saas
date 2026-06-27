@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -14,6 +14,11 @@ class Reward(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     points_required = Column(Integer, nullable=False)
+
+    reward_type = Column(String, default="discount")  # discount, free_item, cashback, custom
+    reward_value = Column(String, nullable=True)
+
+    is_active = Column(Boolean, default=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
