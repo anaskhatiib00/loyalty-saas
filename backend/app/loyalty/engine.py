@@ -1,12 +1,16 @@
 from app.loyalty.registry import LoyaltyStrategyRegistry
+from app.loyalty.rewards import evaluate_unlocked_rewards
 
 
 def calculate_loyalty_progress(
     program,
     current_progress: int,
+    rewards=None,
     amount_spent: float = 0,
     quantity: int = 1,
 ):
+    rewards = rewards or []
+
     strategy = LoyaltyStrategyRegistry.get_strategy(program.program_type)
 
     earned_progress = strategy.calculate(
@@ -17,9 +21,15 @@ def calculate_loyalty_progress(
 
     new_progress = current_progress + earned_progress
 
+    unlocked_rewards = evaluate_unlocked_rewards(
+        rewards=rewards,
+        new_progress=new_progress,
+    )
+
     return {
         "program_type": program.program_type,
         "current_progress": current_progress,
         "earned_progress": earned_progress,
         "new_progress": new_progress,
+        "unlocked_rewards": unlocked_rewards,
     }

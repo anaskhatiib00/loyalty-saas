@@ -17,6 +17,9 @@ from app.services.loyalty_program_service import (
 
 from app.loyalty.engine import calculate_loyalty_progress
 
+from app.repositories.reward_repository import get_rewards_by_business_id
+from app.repositories.business_repository import get_business_by_owner_id
+
 
 router = APIRouter(
     prefix="/loyalty-program",
@@ -58,11 +61,14 @@ def test_loyalty_engine(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    business = get_business_by_owner_id(db, current_user.id)
     program = get_my_loyalty_program_service(db, current_user)
+    rewards = get_rewards_by_business_id(db, business.id)
 
     return calculate_loyalty_progress(
         program=program,
         current_progress=current_progress,
+        rewards=rewards,
         amount_spent=amount_spent,
         quantity=quantity,
     )
