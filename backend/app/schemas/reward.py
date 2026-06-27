@@ -4,8 +4,7 @@ from pydantic import BaseModel
 
 from app.core.enums import RewardType
 
-from app.core.enums import RewardType, RedemptionBehavior
-
+from app.core.enums import RewardType, RedemptionBehavior, RedemptionMode
 
 class RewardCreate(BaseModel):
     name: str
@@ -15,6 +14,7 @@ class RewardCreate(BaseModel):
     reward_value: Optional[str] = None
     is_active: bool = True
     redemption_behavior: RedemptionBehavior = RedemptionBehavior.DEDUCT
+    redemption_mode: RedemptionMode = RedemptionMode.MANUAL
 
 
 class RewardUpdate(BaseModel):
@@ -25,6 +25,7 @@ class RewardUpdate(BaseModel):
     reward_value: Optional[str] = None
     is_active: Optional[bool] = None
     redemption_behavior: Optional[RedemptionBehavior] = None
+    redemption_mode: Optional[RedemptionMode] = None
 
 
 class RewardResponse(BaseModel):
@@ -37,6 +38,7 @@ class RewardResponse(BaseModel):
     reward_value: Optional[str]
     is_active: bool
     redemption_behavior: RedemptionBehavior
+    redemption_mode: RedemptionMode
 
     class Config:
         from_attributes = True

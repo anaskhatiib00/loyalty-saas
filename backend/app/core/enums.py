@@ -28,3 +28,8 @@ class RedemptionBehavior(str, Enum):
     DEDUCT = "deduct"
     CARRY_OVER = "carry_over"
     KEEP = "keep"
+
+
+class RedemptionMode(str, Enum):
+    MANUAL = "manual"
+    CUSTOMER_CHOICE = "customer_choice"
