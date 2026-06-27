@@ -23,3 +23,4 @@ class Business(Base):
     owner = relationship("User", back_populates="businesses")
     customers = relationship("Customer", back_populates="business")
     rewards = relationship("Reward", back_populates="business")
+    locations = relationship("Location", back_populates="business")

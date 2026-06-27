@@ -7,6 +7,7 @@ from app import models
 from app.api.v1.auth import router as auth_router
 from app.api.v1.business import router as business_router
 
+from app.api.v1.location import router as location_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +19,7 @@ app = FastAPI(
 
 app.include_router(auth_router)
 app.include_router(business_router)
+app.include_router(location_router)
 
 
 @app.get("/")
