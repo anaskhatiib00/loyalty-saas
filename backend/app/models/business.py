@@ -24,3 +24,9 @@ class Business(Base):
     customers = relationship("Customer", back_populates="business")
     rewards = relationship("Reward", back_populates="business")
     locations = relationship("Location", back_populates="business")
+
+    loyalty_program = relationship(
+        "LoyaltyProgram",
+        back_populates="business",
+        uselist=False,  
+    )
