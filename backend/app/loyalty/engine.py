@@ -1,4 +1,4 @@
-from app.loyalty.calculators import calculate_earned_progress
+from app.loyalty.registry import LoyaltyStrategyRegistry
 
 
 def calculate_loyalty_progress(
@@ -7,8 +7,9 @@ def calculate_loyalty_progress(
     amount_spent: float = 0,
     quantity: int = 1,
 ):
-    earned_progress = calculate_earned_progress(
-        program_type=program.program_type,
+    strategy = LoyaltyStrategyRegistry.get_strategy(program.program_type)
+
+    earned_progress = strategy.calculate(
         earn_rate=program.earn_rate,
         amount_spent=amount_spent,
         quantity=quantity,
