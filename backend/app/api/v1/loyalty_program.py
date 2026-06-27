@@ -15,6 +15,8 @@ from app.services.loyalty_program_service import (
     update_loyalty_program_service,
 )
 
+from app.loyalty.engine import calculate_loyalty_progress
+
 
 router = APIRouter(
     prefix="/loyalty-program",
@@ -46,3 +48,21 @@ def update_my_loyalty_program(
     current_user: User = Depends(get_current_user),
 ):
     return update_loyalty_program_service(db, current_user, program_data)
+
+
+@router.get("/test-engine")
+def test_loyalty_engine(
+    amount_spent: float = 10,
+    quantity: int = 1,
+    current_progress: int = 0,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    program = get_my_loyalty_program_service(db, current_user)
+
+    return calculate_loyalty_progress(
+        program=program,
+        current_progress=current_progress,
+        amount_spent=amount_spent,
+        quantity=quantity,
+    )
