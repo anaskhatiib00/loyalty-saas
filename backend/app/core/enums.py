@@ -56,3 +56,18 @@ class EmployeeRole(str, Enum):
 class EmployeeStatus(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
+
+
+class LoyaltyActivityType(str, Enum):
+    PURCHASE = "purchase"
+    VISIT = "visit"
+    STAMP_SCAN = "stamp_scan"
+    PRODUCT_PURCHASE = "product_purchase"
+    MANUAL_ADJUSTMENT = "manual_adjustment"
+    REWARD_REDEMPTION = "reward_redemption"
+
+
+class LoyaltyActivityStatus(str, Enum):
+    COMPLETED = "completed"
+    VOIDED = "voided"
+    REFUNDED = "refunded"
