@@ -45,3 +45,14 @@ class LedgerEntryType(str, Enum):
     WELCOME = "welcome"
     BIRTHDAY = "birthday"
     REFERRAL = "referral"
+    
+    
+class EmployeeRole(str, Enum):
+    OWNER = "owner"
+    MANAGER = "manager"
+    CASHIER = "cashier"
+
+
+class EmployeeStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
