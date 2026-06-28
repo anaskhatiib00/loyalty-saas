@@ -16,6 +16,8 @@ from app.api.v1.customer import router as customer_router
 
 from app.api.v1.progress_ledger import router as progress_ledger_router
 
+from app.api.v1.loyalty_card import router as loyalty_card_router
+
 #Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -31,6 +33,7 @@ app.include_router(loyalty_program_router)
 app.include_router(reward_router)
 app.include_router(customer_router)
 app.include_router(progress_ledger_router)
+app.include_router(loyalty_card_router)
 
 
 @app.get("/")

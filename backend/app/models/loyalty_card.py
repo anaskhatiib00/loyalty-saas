@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -9,10 +9,13 @@ class LoyaltyCard(Base):
     __tablename__ = "loyalty_cards"
 
     id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
+
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False, unique=True)
 
     card_number = Column(String, unique=True, index=True, nullable=False)
-    points_balance = Column(Integer, default=0)
+    public_id = Column(String, unique=True, index=True, nullable=False)
+
+    status = Column(String, default="active")  # active, suspended, replaced
 
     apple_pass_url = Column(String, nullable=True)
     google_pass_url = Column(String, nullable=True)
