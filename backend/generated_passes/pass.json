@@ -1,0 +1,46 @@
+{
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.com.demo.loyalty",
+    "serialNumber": "CARD-001",
+    "teamIdentifier": "TEAM12345",
+    "organizationName": "Demo Coffee",
+    "description": "Demo Coffee Loyalty Card",
+    "logoText": "Demo Coffee",
+    "foregroundColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgb(0, 0, 0)",
+    "labelColor": "rgb(255, 255, 255)",
+    "authenticationToken": "token123",
+    "barcode": {
+        "message": "550e8400-e29b-41d4-a716-446655440000",
+        "format": "PKBarcodeFormatQR",
+        "messageEncoding": "iso-8859-1"
+    },
+    "storeCard": {
+        "primaryFields": [
+            {
+                "key": "customer",
+                "label": "Customer",
+                "value": "Ahmad Saleh"
+            }
+        ],
+        "secondaryFields": [
+            {
+                "key": "business",
+                "label": "Business",
+                "value": "Demo Coffee"
+            },
+            {
+                "key": "progress",
+                "label": "Progress",
+                "value": 12
+            }
+        ],
+        "auxiliaryFields": [
+            {
+                "key": "card_number",
+                "label": "Card Number",
+                "value": "DEMO-A8K2-91QP"
+            }
+        ]
+    }
+}
