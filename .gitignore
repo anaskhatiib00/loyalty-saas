@@ -17,3 +17,9 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Apple Wallet certificates
+certificates/*.pem
+certificates/*.p12
+certificates/*.key
+certificates/*.cer
