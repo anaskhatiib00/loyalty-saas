@@ -8,10 +8,10 @@ from app.schemas.loyalty_activity import (
     LoyaltyActivityCreate,
     LoyaltyActivityResponse,
 )
-from app.services.loyalty_activity_service import (
-    process_loyalty_activity_service,
-    list_customer_activities_service,
+from app.application.loyalty_activity_application import (
+    process_loyalty_activity_application,
 )
+from app.services.loyalty_activity_service import list_customer_activities_service
 
 
 router = APIRouter(
@@ -26,7 +26,7 @@ def process_loyalty_activity(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return process_loyalty_activity_service(db, current_user, activity_data)
+    return process_loyalty_activity_application(db, current_user, activity_data)
 
 
 @router.get("/customer/{customer_id}", response_model=list[LoyaltyActivityResponse])
