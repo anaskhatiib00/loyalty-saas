@@ -1,4 +1,6 @@
 import json
+import shutil
+import tempfile
 from pathlib import Path
 
 from app.credentials.apple_wallet.pass_json import build_pass_json
@@ -13,33 +15,33 @@ class AppleWalletBuilder:
         self,
         context: ApplePassContext,
         assets_directory: str,
-        output_directory: str,
+        output_path: str,
     ) -> str:
-
         assets_path = Path(assets_directory)
-        output_path = Path(output_directory)
+        final_output_path = Path(output_path)
 
-        output_path.mkdir(parents=True, exist_ok=True)
+        final_output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Copy assets
-        for asset in assets_path.iterdir():
-            if asset.is_file():
-                (output_path / asset.name).write_bytes(asset.read_bytes())
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-        # Generate pass.json
-        pass_json = build_pass_json(context)
+            for asset in assets_path.iterdir():
+                if asset.is_file():
+                    shutil.copy(asset, temp_path / asset.name)
 
-        with open(output_path / "pass.json", "w", encoding="utf-8") as file:
-            json.dump(pass_json, file, indent=4)
+            pass_json = build_pass_json(context)
 
-        # Generate manifest.json
-        manifest = build_manifest(str(output_path))
+            with open(temp_path / "pass.json", "w", encoding="utf-8") as file:
+                json.dump(pass_json, file, indent=4)
 
-        with open(output_path / "manifest.json", "w", encoding="utf-8") as file:
-            json.dump(manifest, file, indent=4)
+            manifest = build_manifest(str(temp_path))
 
-        # Build pkpass
-        return create_pkpass_archive(
-            str(output_path),
-            str(output_path / "pass.pkpass"),
-        )
+            with open(temp_path / "manifest.json", "w", encoding="utf-8") as file:
+                json.dump(manifest, file, indent=4)
+
+            create_pkpass_archive(
+                str(temp_path),
+                str(final_output_path),
+            )
+
+        return str(final_output_path)
