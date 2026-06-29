@@ -19,7 +19,7 @@ from app.repositories.reward_repository import get_rewards_by_business_id
 from app.schemas.loyalty_activity import LoyaltyActivityCreate
 
 
-def process_loyalty_activity_application(
+def process_loyalty_activity_use_case(
     db: Session,
     current_user: User,
     activity_data: LoyaltyActivityCreate,
