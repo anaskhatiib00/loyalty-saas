@@ -71,3 +71,14 @@ class LoyaltyActivityStatus(str, Enum):
     COMPLETED = "completed"
     VOIDED = "voided"
     REFUNDED = "refunded"
+
+
+class WalletProvider(str, Enum):
+    APPLE = "apple"
+    GOOGLE = "google"
+
+
+class WalletPassStatus(str, Enum):
+    ACTIVE = "active"
+    REVOKED = "revoked"
+    PENDING = "pending"

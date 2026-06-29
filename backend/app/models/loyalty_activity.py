@@ -31,5 +31,8 @@ class LoyaltyActivity(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     customer = relationship("Customer")
-    loyalty_card = relationship("LoyaltyCard")
+    loyalty_card = relationship(
+    "LoyaltyCard",
+    back_populates="activities",
+    )
     employee = relationship("Employee")

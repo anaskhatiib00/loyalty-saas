@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -13,8 +11,6 @@ class LoyaltyCardResponse(BaseModel):
     card_number: str
     public_id: str
     status: str
-    apple_pass_url: Optional[str]
-    google_pass_url: Optional[str]
 
     class Config:
         from_attributes = True

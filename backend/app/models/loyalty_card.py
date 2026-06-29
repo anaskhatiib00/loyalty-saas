@@ -17,10 +17,24 @@ class LoyaltyCard(Base):
 
     status = Column(String, default="active")  # active, suspended, replaced
 
-    apple_pass_url = Column(String, nullable=True)
-    google_pass_url = Column(String, nullable=True)
-
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    customer = relationship("Customer", back_populates="loyalty_card")
-    transactions = relationship("Transaction", back_populates="loyalty_card")
+    customer = relationship(
+        "Customer",
+        back_populates="loyalty_card",
+    )
+
+    transactions = relationship(
+        "Transaction",
+        back_populates="loyalty_card",
+    )
+
+    activities = relationship(
+        "LoyaltyActivity",
+        back_populates="loyalty_card",
+    )
+
+    wallet_passes = relationship(
+        "WalletPass",
+        back_populates="loyalty_card",
+    )

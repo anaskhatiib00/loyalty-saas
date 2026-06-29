@@ -9,3 +9,4 @@ from app.models.loyalty_program import LoyaltyProgram
 from app.models.progress_ledger import ProgressLedger
 from app.models.employee import Employee
 from app.models.loyalty_activity import LoyaltyActivity
+from app.models.wallet_pass import WalletPass

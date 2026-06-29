@@ -17,4 +17,7 @@ class Transaction(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    loyalty_card = relationship("LoyaltyCard", back_populates="transactions")
+    loyalty_card = relationship(
+        "LoyaltyCard",
+        back_populates="transactions",
+    )
