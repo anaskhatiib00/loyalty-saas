@@ -5,8 +5,8 @@ from sqlalchemy.sql import func
 from app.db.database import Base
 
 
-class WalletPass(Base):
-    __tablename__ = "wallet_passes"
+class Credential(Base):
+    __tablename__ = "credentials"
 
     id = Column(Integer, primary_key=True, index=True)
 
@@ -25,12 +25,9 @@ class WalletPass(Base):
 
     last_synced_at = Column(DateTime(timezone=True), nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-    )
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     loyalty_card = relationship(
         "LoyaltyCard",
-        back_populates="wallet_passes",
+        back_populates="credentials",
     )

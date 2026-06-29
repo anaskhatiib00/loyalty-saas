@@ -34,7 +34,7 @@ class LoyaltyCard(Base):
         back_populates="loyalty_card",
     )
 
-    wallet_passes = relationship(
-        "WalletPass",
-        back_populates="loyalty_card",
+    credentials = relationship(
+    "Credential",
+    back_populates="loyalty_card",
     )

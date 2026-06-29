@@ -73,12 +73,15 @@ class LoyaltyActivityStatus(str, Enum):
     REFUNDED = "refunded"
 
 
-class WalletProvider(str, Enum):
-    APPLE = "apple"
-    GOOGLE = "google"
+class CredentialProvider(str, Enum):
+    QR = "qr"
+    APPLE_WALLET = "apple_wallet"
+    GOOGLE_WALLET = "google_wallet"
+    PHYSICAL_CARD = "physical_card"
+    NFC = "nfc"
 
 
-class WalletPassStatus(str, Enum):
+class CredentialStatus(str, Enum):
     ACTIVE = "active"
     REVOKED = "revoked"
     PENDING = "pending"
