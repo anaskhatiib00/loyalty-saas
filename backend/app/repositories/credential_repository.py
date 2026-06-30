@@ -22,3 +22,14 @@ def get_credentials_by_card_id(db: Session, loyalty_card_id: int):
         .filter(Credential.loyalty_card_id == loyalty_card_id)
         .all()
     )
+
+
+def get_credential_by_provider_reference(
+    db: Session,
+    provider_reference: str,
+):
+    return (
+        db.query(Credential)
+        .filter(Credential.provider_reference == provider_reference)
+        .first()
+    )

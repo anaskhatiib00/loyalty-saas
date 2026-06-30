@@ -26,6 +26,11 @@ from app.api.v1.scan import router as scan_router
 
 from app.api.v1.credential import router as credential_router
 
+from app.api.v1.apple_wallet.web_service import (
+    router as apple_wallet_router,
+)
+
+
 #Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -46,6 +51,8 @@ app.include_router(employee_router)
 app.include_router(loyalty_activity_router)
 app.include_router(scan_router)
 app.include_router(credential_router)
+app.include_router(apple_wallet_router)
+
 
 @app.get("/")
 def root():
@@ -63,3 +70,5 @@ def database_health_check():
         connection.execute(text("SELECT 1"))
 
     return {"database": "connected"}
+
+
