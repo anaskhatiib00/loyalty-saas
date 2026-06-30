@@ -8,3 +8,17 @@ def create_credential(db: Session, credential: Credential):
     db.commit()
     db.refresh(credential)
     return credential
+
+
+def update_credential(db: Session, credential: Credential):
+    db.commit()
+    db.refresh(credential)
+    return credential
+
+
+def get_credentials_by_card_id(db: Session, loyalty_card_id: int):
+    return (
+        db.query(Credential)
+        .filter(Credential.loyalty_card_id == loyalty_card_id)
+        .all()
+    )

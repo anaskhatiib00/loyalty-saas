@@ -24,6 +24,8 @@ from app.api.v1.loyalty_activity import router as loyalty_activity_router
 
 from app.api.v1.scan import router as scan_router
 
+from app.api.v1.credential import router as credential_router
+
 #Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -43,6 +45,7 @@ app.include_router(loyalty_card_router)
 app.include_router(employee_router)
 app.include_router(loyalty_activity_router)
 app.include_router(scan_router)
+app.include_router(credential_router)
 
 @app.get("/")
 def root():
