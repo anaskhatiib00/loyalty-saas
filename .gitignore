@@ -23,3 +23,7 @@ certificates/*.pem
 certificates/*.p12
 certificates/*.key
 certificates/*.cer
+
+# Generated storage files
+storage/
+generated_passes/
