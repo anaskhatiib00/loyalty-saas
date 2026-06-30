@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from backend.app.core.settings import settings
+from app.core.settings import settings
 from app.db.database import get_db
 from app.models.user import User
 

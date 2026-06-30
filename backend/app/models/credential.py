@@ -18,7 +18,7 @@ class Credential(Base):
 
     provider = Column(String, nullable=False)
 
-    external_id = Column(String, nullable=True)
+    provider_reference = Column(String, nullable=True)
     authentication_token = Column(String, nullable=True)
 
     status = Column(String, default="pending")
