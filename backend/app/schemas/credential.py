@@ -13,6 +13,7 @@ class CredentialResponse(BaseModel):
     loyalty_card_id: int
     provider: CredentialProvider
     provider_reference: str | None
+    storage_path: str | None
     authentication_token: str | None
     status: CredentialStatus
 

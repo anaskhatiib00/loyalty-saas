@@ -84,7 +84,7 @@ def issue_apple_wallet_credential_use_case(
         destination_path=f"apple_wallet/{loyalty_card.public_id}.pkpass",
     )
 
-    credential.provider_reference = stored_path
+    credential.storage_path = stored_path
     credential.status = CredentialStatus.ACTIVE
 
     return update_credential(db, credential)

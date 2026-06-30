@@ -19,6 +19,7 @@ class Credential(Base):
     provider = Column(String, nullable=False)
 
     provider_reference = Column(String, nullable=True)
+    storage_path = Column(String, nullable=True)
     authentication_token = Column(String, nullable=True)
 
     status = Column(String, default="pending")
