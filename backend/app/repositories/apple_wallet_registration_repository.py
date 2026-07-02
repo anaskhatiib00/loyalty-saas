@@ -54,3 +54,21 @@ def get_registrations_by_device(
         )
         .all()
     )
+
+
+def get_registrations_by_device_updated_since(
+    db: Session,
+    device_library_identifier: str,
+    updated_since,
+):
+    query = db.query(AppleWalletRegistration).filter(
+        AppleWalletRegistration.device_library_identifier
+        == device_library_identifier
+    )
+
+    if updated_since:
+        query = query.filter(
+            AppleWalletRegistration.last_updated_at > updated_since
+        )
+
+    return query.all()
