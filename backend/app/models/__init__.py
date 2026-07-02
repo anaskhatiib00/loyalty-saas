@@ -10,3 +10,4 @@ from app.models.progress_ledger import ProgressLedger
 from app.models.employee import Employee
 from app.models.loyalty_activity import LoyaltyActivity
 from app.models.credential import Credential
+from app.models.apple_wallet_registration import AppleWalletRegistration
