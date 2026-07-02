@@ -4,9 +4,17 @@ from sqlalchemy.sql import func
 
 from app.db.database import Base
 
+from sqlalchemy import UniqueConstraint
 
 class Credential(Base):
     __tablename__ = "credentials"
+    __table_args__ = (
+    UniqueConstraint(
+        "loyalty_card_id",
+        "provider",
+        name="uq_credential_card_provider",
+    ),
+    )   
 
     id = Column(Integer, primary_key=True, index=True)
 
