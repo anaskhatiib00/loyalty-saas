@@ -1,19 +1,31 @@
+import logging
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.application.use_cases.generate_apple_wallet_pass import (
     generate_apple_wallet_pass_use_case,
 )
 from app.db.database import get_db
-from app.repositories.credential_repository import get_credential_by_provider_reference
+from app.repositories.credential_repository import (
+    get_credential_by_provider_reference,
+)
 from app.repositories.apple_wallet_registration_repository import (
-    get_registration,
     create_registration,
     delete_registration,
+    get_registration,
     get_registrations_by_device,
 )
 from app.schemas.apple_wallet import AppleWalletRegistrationRequest
+
+logger = logging.getLogger(__name__)
+
+
+class AppleWalletLogRequest(BaseModel):
+    logs: List[str]
 
 router = APIRouter(
     prefix="/v1",
@@ -125,3 +137,11 @@ def get_updated_passes(
         "lastUpdated": "",
         "serialNumbers": serial_numbers,
     }
+
+
+@router.post("/log")
+def wallet_log(log_request: AppleWalletLogRequest):
+    for message in log_request.logs:
+        logger.info(f"Apple Wallet: {message}")
+
+    return {}
