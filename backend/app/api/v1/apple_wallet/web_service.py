@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -69,7 +69,7 @@ def get_wallet_pass(
 
 @router.post(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def register_device_for_pass(
     device_library_identifier: str,
@@ -90,7 +90,7 @@ def register_device_for_pass(
     )
 
     if existing_registration:
-        return {}
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     create_registration(
         db=db,
@@ -99,11 +99,12 @@ def register_device_for_pass(
         push_token=registration_data.pushToken,
     )
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def unregister_device_from_pass(
     device_library_identifier: str,
@@ -127,7 +128,7 @@ def unregister_device_from_pass(
 
     delete_registration(db, registration)
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get(
@@ -160,9 +161,9 @@ def get_updated_passes(
     }
 
 
-@router.post("/log")
+@router.post("/log", status_code=status.HTTP_204_NO_CONTENT)
 def wallet_log(log_request: AppleWalletLogRequest):
     for message in log_request.logs:
         logger.info(f"Apple Wallet: {message}")
 
-    return {}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
