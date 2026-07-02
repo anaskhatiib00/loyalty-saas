@@ -8,7 +8,11 @@ from app.credentials.apple_wallet.schemas import ApplePassContext
 from app.models.credential import Credential
 from app.models.user import User
 from app.repositories.business_repository import get_business_by_owner_id
-from app.repositories.credential_repository import create_credential, update_credential
+from app.repositories.credential_repository import (
+    create_credential,
+    update_credential,
+    get_credential_by_card_and_provider,
+)
 from app.repositories.customer_repository import get_customer_by_id
 from app.repositories.loyalty_card_repository import get_loyalty_card_by_customer_id
 from app.storage.local_storage import LocalStorageService
@@ -34,6 +38,15 @@ def issue_apple_wallet_credential_use_case(
 
     if not loyalty_card:
         raise HTTPException(status_code=404, detail="Loyalty card not found")
+
+    existing_credential = get_credential_by_card_and_provider(
+        db=db,
+        loyalty_card_id=loyalty_card.id,
+        provider=CredentialProvider.APPLE_WALLET,
+    )
+
+    if existing_credential:
+        return existing_credential
 
     authentication_token = generate_authentication_token()
     serial_number = loyalty_card.public_id
@@ -68,12 +81,10 @@ def issue_apple_wallet_credential_use_case(
 
     builder = AppleWalletBuilder()
 
-    unsigned_output_path = f"generated_passes/{loyalty_card.public_id}.pkpass"
-
     generated_pass_path = builder.build(
         context=context,
         assets_directory="assets/apple_wallet",
-        output_path=unsigned_output_path,
+        output_path=f"generated_passes/{loyalty_card.public_id}.pkpass",
         require_signature=False,
     )
 

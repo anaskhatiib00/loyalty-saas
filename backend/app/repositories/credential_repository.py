@@ -41,3 +41,18 @@ def get_credential_by_provider_reference(db: Session, provider_reference: str):
         .filter(Credential.provider_reference == provider_reference)
         .first()
     )
+
+
+def get_credential_by_card_and_provider(
+    db: Session,
+    loyalty_card_id: int,
+    provider: str,
+):
+    return (
+        db.query(Credential)
+        .filter(
+            Credential.loyalty_card_id == loyalty_card_id,
+            Credential.provider == provider,
+        )
+        .first()
+    )
