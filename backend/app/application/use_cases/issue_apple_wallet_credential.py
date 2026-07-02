@@ -66,9 +66,8 @@ def issue_apple_wallet_credential_use_case(
     context = ApplePassContext(
         serial_number=serial_number,
         authentication_token=authentication_token,
-        team_identifier=settings.APPLE_TEAM_IDENTIFIER or "DEMO_TEAM",
-        pass_type_identifier=settings.APPLE_PASS_TYPE_IDENTIFIER
-        or "pass.com.demo.loyalty",
+        team_identifier=settings.APPLE_TEAM_IDENTIFIER,
+        pass_type_identifier=settings.APPLE_PASS_TYPE_IDENTIFIER,
         organization_name=business.name,
         description=f"{business.name} Loyalty Card",
         logo_text=business.name,

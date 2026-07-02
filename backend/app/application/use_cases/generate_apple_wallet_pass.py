@@ -36,9 +36,8 @@ def generate_apple_wallet_pass_use_case(
     context = ApplePassContext(
         serial_number=credential.provider_reference,
         authentication_token=credential.authentication_token or "missing-token",
-        team_identifier=settings.APPLE_TEAM_IDENTIFIER or "DEMO_TEAM",
-        pass_type_identifier=settings.APPLE_PASS_TYPE_IDENTIFIER
-        or "pass.com.demo.loyalty",
+        team_identifier=settings.APPLE_TEAM_IDENTIFIER,
+        pass_type_identifier=settings.APPLE_PASS_TYPE_IDENTIFIER,
         organization_name=customer.business.name,
         description=f"{customer.business.name} Loyalty Card",
         logo_text=customer.business.name,
