@@ -38,6 +38,13 @@ class AppleWalletLogRequest(BaseModel):
     logs: List[str]
 
 
+def format_apple_timestamp(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 def parse_apple_timestamp(value: str | None):
     if not value:
         return None
@@ -69,20 +76,15 @@ def get_wallet_pass(
 
 @router.post(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
-    status_code=status.HTTP_204_NO_CONTENT,
 )
 def register_device_for_pass(
     device_library_identifier: str,
     pass_type_identifier: str,
     serial_number: str,
     registration_data: AppleWalletRegistrationRequest,
+    credential=Depends(validate_apple_pass_authentication),
     db: Session = Depends(get_db),
 ):
-    credential = get_credential_by_provider_reference(db, serial_number)
-
-    if not credential:
-        raise HTTPException(status_code=404, detail="Pass not found")
-
     existing_registration = get_registration(
         db=db,
         credential_id=credential.id,
@@ -90,7 +92,7 @@ def register_device_for_pass(
     )
 
     if existing_registration:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_200_OK)
 
     create_registration(
         db=db,
@@ -99,7 +101,7 @@ def register_device_for_pass(
         push_token=registration_data.pushToken,
     )
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_201_CREATED)
 
 
 @router.delete(
@@ -110,13 +112,9 @@ def unregister_device_from_pass(
     device_library_identifier: str,
     pass_type_identifier: str,
     serial_number: str,
+    credential=Depends(validate_apple_pass_authentication),
     db: Session = Depends(get_db),
 ):
-    credential = get_credential_by_provider_reference(db, serial_number)
-
-    if not credential:
-        raise HTTPException(status_code=404, detail="Pass not found")
-
     registration = get_registration(
         db=db,
         credential_id=credential.id,
@@ -148,15 +146,22 @@ def get_updated_passes(
         updated_since=updated_since,
     )
 
+    if not registrations:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
     serial_numbers = [
         registration.credential.provider_reference
         for registration in registrations
     ]
 
-    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    latest_update = max(
+        registration.last_updated_at
+        for registration in registrations
+        if registration.last_updated_at is not None
+    )
 
     return {
-        "lastUpdated": now,
+        "lastUpdated": format_apple_timestamp(latest_update),
         "serialNumbers": serial_numbers,
     }
 
