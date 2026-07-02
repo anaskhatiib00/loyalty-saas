@@ -40,3 +40,17 @@ def create_registration(
 def delete_registration(db: Session, registration: AppleWalletRegistration):
     db.delete(registration)
     db.commit()
+
+
+def get_registrations_by_device(
+    db: Session,
+    device_library_identifier: str,
+):
+    return (
+        db.query(AppleWalletRegistration)
+        .filter(
+            AppleWalletRegistration.device_library_identifier
+            == device_library_identifier
+        )
+        .all()
+    )

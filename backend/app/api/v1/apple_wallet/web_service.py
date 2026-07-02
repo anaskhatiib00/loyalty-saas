@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -11,9 +11,9 @@ from app.repositories.apple_wallet_registration_repository import (
     get_registration,
     create_registration,
     delete_registration,
+    get_registrations_by_device,
 )
 from app.schemas.apple_wallet import AppleWalletRegistrationRequest
-
 
 router = APIRouter(
     prefix="/v1",
@@ -100,3 +100,28 @@ def unregister_device_from_pass(
     delete_registration(db, registration)
 
     return {}
+
+
+@router.get(
+    "/devices/{device_library_identifier}/registrations/{pass_type_identifier}",
+)
+def get_updated_passes(
+    device_library_identifier: str,
+    pass_type_identifier: str,
+    passesUpdatedSince: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    registrations = get_registrations_by_device(
+        db=db,
+        device_library_identifier=device_library_identifier,
+    )
+
+    serial_numbers = [
+        registration.credential.provider_reference
+        for registration in registrations
+    ]
+
+    return {
+        "lastUpdated": "",
+        "serialNumbers": serial_numbers,
+    }

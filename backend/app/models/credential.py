@@ -32,3 +32,8 @@ class Credential(Base):
         "LoyaltyCard",
         back_populates="credentials",
     )
+
+    registrations = relationship(
+    "AppleWalletRegistration",
+    back_populates="credential",
+    )
