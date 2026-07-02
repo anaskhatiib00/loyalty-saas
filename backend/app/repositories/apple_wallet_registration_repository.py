@@ -35,3 +35,8 @@ def create_registration(
     db.refresh(registration)
 
     return registration
+
+
+def delete_registration(db: Session, registration: AppleWalletRegistration):
+    db.delete(registration)
+    db.commit()

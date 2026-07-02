@@ -10,6 +10,7 @@ from app.repositories.credential_repository import get_credential_by_provider_re
 from app.repositories.apple_wallet_registration_repository import (
     get_registration,
     create_registration,
+    delete_registration,
 )
 from app.schemas.apple_wallet import AppleWalletRegistrationRequest
 
@@ -69,5 +70,33 @@ def register_device_for_pass(
         device_library_identifier=device_library_identifier,
         push_token=registration_data.pushToken,
     )
+
+    return {}
+
+
+@router.delete(
+    "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
+)
+def unregister_device_from_pass(
+    device_library_identifier: str,
+    pass_type_identifier: str,
+    serial_number: str,
+    db: Session = Depends(get_db),
+):
+    credential = get_credential_by_provider_reference(db, serial_number)
+
+    if not credential:
+        raise HTTPException(status_code=404, detail="Pass not found")
+
+    registration = get_registration(
+        db=db,
+        credential_id=credential.id,
+        device_library_identifier=device_library_identifier,
+    )
+
+    if not registration:
+        raise HTTPException(status_code=404, detail="Registration not found")
+
+    delete_registration(db, registration)
 
     return {}
