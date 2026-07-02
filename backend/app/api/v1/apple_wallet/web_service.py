@@ -21,6 +21,10 @@ from app.repositories.apple_wallet_registration_repository import (
 )
 from app.schemas.apple_wallet import AppleWalletRegistrationRequest
 
+from app.credentials.apple_wallet.dependencies import (
+    validate_apple_pass_authentication,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,6 +41,7 @@ router = APIRouter(
 def get_wallet_pass(
     pass_type_identifier: str,
     serial_number: str,
+    credential=Depends(validate_apple_pass_authentication),
     db: Session = Depends(get_db),
 ):
     pkpass_path = generate_apple_wallet_pass_use_case(
@@ -145,3 +150,5 @@ def wallet_log(log_request: AppleWalletLogRequest):
         logger.info(f"Apple Wallet: {message}")
 
     return {}
+
+
