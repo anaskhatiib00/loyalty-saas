@@ -30,6 +30,8 @@ from app.api.v1.apple_wallet.web_service import (
     router as apple_wallet_router,
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
 
 #Base.metadata.create_all(bind=engine)
 
@@ -37,6 +39,17 @@ app = FastAPI(
     title="Loyalty SaaS API",
     description="Backend API for digital loyalty cards and wallet integration",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)

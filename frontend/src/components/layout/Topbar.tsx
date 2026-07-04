@@ -2,6 +2,8 @@ import { Bell, Search } from "lucide-react"
 
 import { MobileSidebar } from "./MobileSidebar"
 
+import { UserMenu } from "./UserMenu"
+
 export function Topbar() {
   return (
     <header className="flex h-16 items-center justify-between border-b border-white/10 bg-black px-4 text-white md:px-6">
@@ -25,9 +27,7 @@ export function Topbar() {
           <Bell className="h-4 w-4" />
         </button>
 
-        <div className="hidden rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 sm:block">
-          Owner
-        </div>
+        <UserMenu />
       </div>
     </header>
   )
