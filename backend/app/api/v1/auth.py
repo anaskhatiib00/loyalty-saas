@@ -7,7 +7,12 @@ from app.repositories.user_repository import (
     get_user_by_email,
     create_user,
 )
-from app.schemas.user import UserRegister, UserLogin, UserResponse
+from app.schemas.user import (
+    UserRegister,
+    UserLogin,
+    UserResponse,
+    CurrentUserResponse,
+)
 from app.schemas.token import TokenResponse
 from app.core.security import (
     hash_password,
@@ -17,6 +22,8 @@ from app.core.security import (
 from app.core.dependencies import get_current_user
 
 from fastapi.security import OAuth2PasswordRequestForm
+
+from app.repositories.business_repository import get_business_by_owner_id
 
 
 router = APIRouter(
@@ -92,6 +99,17 @@ def login(
     }
 
 
-@router.get("/me", response_model=UserResponse)
-def get_me(current_user: User = Depends(get_current_user)):
-    return current_user
+@router.get("/me", response_model=CurrentUserResponse)
+def get_me(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    business = get_business_by_owner_id(db, current_user.id)
+
+    return {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "email": current_user.email,
+        "role": current_user.role,
+        "business": business,
+    }

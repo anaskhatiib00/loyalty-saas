@@ -1,17 +1,23 @@
+"use client"
+
 import { Bell, Search } from "lucide-react"
 
+import { useAuth } from "@/hooks/useAuth"
 import { MobileSidebar } from "./MobileSidebar"
-
 import { UserMenu } from "./UserMenu"
 
 export function Topbar() {
+  const { user } = useAuth()
+
+  const businessName = user?.business?.name || "Business Console"
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-white/10 bg-black px-4 text-white md:px-6">
       <div className="flex items-center gap-3">
         <MobileSidebar />
 
         <div>
-          <p className="text-sm font-medium">Demo Coffee</p>
+          <p className="text-sm font-medium">{businessName}</p>
           <p className="text-xs text-white/40">All locations</p>
         </div>
       </div>

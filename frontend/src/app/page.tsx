@@ -4,6 +4,10 @@ import { DashboardShell } from "@/components/layout/DashboardShell"
 import { QuickActions } from "@/components/dashboard/QuickActions"
 import { RecentActivity } from "@/components/dashboard/RecentActivity"
 import { StatCard } from "@/components/dashboard/StatCard"
+import {
+  customerService,
+  type Customer,
+} from "@/features/customers"
 
 export default function DashboardPage() {
   return (

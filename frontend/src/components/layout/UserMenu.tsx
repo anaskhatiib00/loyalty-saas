@@ -15,7 +15,14 @@ import {
 
 export function UserMenu() {
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
+
+  const displayName = user?.full_name || user?.email || "User"
+  const role = user?.role
+  ? user.role
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  : "Owner"
 
   function handleLogout() {
     logout()
@@ -25,14 +32,14 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="hidden rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white sm:flex">
-        Owner
+        {role}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div>
-            <p className="text-sm font-medium">Abdullah</p>
-            <p className="text-xs text-muted-foreground">Owner</p>
+            <p className="text-sm font-medium">{displayName}</p>
+            <p className="text-xs text-muted-foreground">{role}</p>
           </div>
         </DropdownMenuLabel>
 

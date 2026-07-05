@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+
 
 
 class UserRegister(BaseModel):
@@ -17,6 +19,25 @@ class UserResponse(BaseModel):
     full_name: str
     email: EmailStr
     role: str
+
+    class Config:
+        from_attributes = True
+
+
+class BusinessSummary(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
+class CurrentUserResponse(BaseModel):
+    id: int
+    full_name: str
+    email: str
+    role: str
+    business: BusinessSummary | None = None
 
     class Config:
         from_attributes = True
