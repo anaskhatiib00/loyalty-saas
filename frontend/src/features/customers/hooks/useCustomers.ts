@@ -16,8 +16,14 @@ export function useCustomers() {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<CustomerSortValue>("newest")
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  async function refreshCustomers() {
+    const customers = await customerService.getCustomers()
+    setCustomers(customers)
+  }
 
   useEffect(() => {
     async function fetchCustomers() {
@@ -25,8 +31,7 @@ export function useCustomers() {
         setLoading(true)
         setError(null)
 
-        const customers = await customerService.getCustomers()
-        setCustomers(customers)
+        await refreshCustomers()
       } catch {
         setError("Could not load customers.")
       } finally {
@@ -78,6 +83,41 @@ export function useCustomers() {
     currentPage * pageSize
   )
 
+  const pageCustomerIds = paginatedCustomers.map((customer) => customer.id)
+
+  const allPageSelected =
+    pageCustomerIds.length > 0 &&
+    pageCustomerIds.every((id) => selectedCustomerIds.includes(id))
+
+  function toggleCustomerSelection(customerId: number) {
+    setSelectedCustomerIds((current) =>
+      current.includes(customerId)
+        ? current.filter((id) => id !== customerId)
+        : [...current, customerId]
+    )
+  }
+
+  function togglePageSelection() {
+    const allSelected = pageCustomerIds.every((id) =>
+      selectedCustomerIds.includes(id)
+    )
+
+    if (allSelected) {
+      setSelectedCustomerIds((current) =>
+        current.filter((id) => !pageCustomerIds.includes(id))
+      )
+      return
+    }
+
+    setSelectedCustomerIds((current) =>
+      Array.from(new Set([...current, ...pageCustomerIds]))
+    )
+  }
+
+  function clearSelection() {
+    setSelectedCustomerIds([])
+  }
+
   return {
     search,
     setSearch,
@@ -90,5 +130,11 @@ export function useCustomers() {
     totalPages,
     totalCustomers: sortedCustomers.length,
     paginatedCustomers,
+    selectedCustomerIds,
+    allPageSelected,
+    toggleCustomerSelection,
+    togglePageSelection,
+    clearSelection,
+    refreshCustomers,
   }
 }

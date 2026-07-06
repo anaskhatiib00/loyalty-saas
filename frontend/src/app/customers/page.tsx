@@ -4,8 +4,11 @@ import { Plus } from "lucide-react"
 
 import { DashboardShell } from "@/components/layout/DashboardShell"
 import {
+  CreateCustomerDialog,
+  CustomerBulkActions,
   CustomerEmptyState,
   CustomerLoadingSkeleton,
+  CustomerMobileCards,
   CustomerPagination,
   CustomerSearch,
   CustomerSort,
@@ -27,6 +30,12 @@ export default function CustomersPage() {
     totalPages,
     totalCustomers,
     paginatedCustomers,
+    selectedCustomerIds,
+    allPageSelected,
+    toggleCustomerSelection,
+    togglePageSelection,
+    clearSelection,
+    refreshCustomers,
   } = useCustomers()
 
   return (
@@ -45,10 +54,15 @@ export default function CustomersPage() {
             </p>
           </div>
 
-          <button className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white/90">
-            <Plus className="h-4 w-4" />
-            New Customer
-          </button>
+          <CreateCustomerDialog
+            onCustomerCreated={refreshCustomers}
+            trigger={
+              <button className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white/90">
+                <Plus className="h-4 w-4" />
+                New Customer
+              </button>
+            }
+          />
         </div>
 
         <CustomerStats total={totalCustomers} />
@@ -58,6 +72,11 @@ export default function CustomersPage() {
           <CustomerSort value={sort} onChange={setSort} />
         </div>
 
+        <CustomerBulkActions
+          selectedCount={selectedCustomerIds.length}
+          onClearSelection={clearSelection}
+        />
+
         {loading && <CustomerLoadingSkeleton />}
 
         {!loading && error && (
@@ -66,10 +85,27 @@ export default function CustomersPage() {
           </div>
         )}
 
-        {!loading && !error && (
-          totalCustomers > 0 ? (
+        {!loading &&
+          !error &&
+          (totalCustomers > 0 ? (
             <>
-              <CustomerTable customers={paginatedCustomers} />
+              <div className="hidden md:block">
+                <CustomerTable
+                  customers={paginatedCustomers}
+                  selectedCustomerIds={selectedCustomerIds}
+                  allPageSelected={allPageSelected}
+                  onToggleCustomer={toggleCustomerSelection}
+                  onTogglePageSelection={togglePageSelection}
+                  onCustomerDeleted={refreshCustomers}
+                />
+              </div>
+
+              <CustomerMobileCards
+                customers={paginatedCustomers}
+                selectedCustomerIds={selectedCustomerIds}
+                onToggleCustomer={toggleCustomerSelection}
+                onCustomerDeleted={refreshCustomers}
+              />
 
               <CustomerPagination
                 currentPage={currentPage}
@@ -79,8 +115,7 @@ export default function CustomersPage() {
             </>
           ) : (
             <CustomerEmptyState />
-          )
-        )}
+          ))}
       </div>
     </DashboardShell>
   )

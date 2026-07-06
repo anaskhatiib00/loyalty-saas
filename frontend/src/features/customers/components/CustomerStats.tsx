@@ -29,14 +29,14 @@ export function CustomerStats({ total }: CustomerStatsProps) {
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon
 
         return (
           <div
             key={card.title}
-            className="rounded-3xl border border-white/10 bg-white/[0.03] p-6"
+            className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 md:p-6"
           >
             <div className="flex items-center justify-between">
               <div>
