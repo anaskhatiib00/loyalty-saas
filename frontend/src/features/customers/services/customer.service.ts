@@ -1,5 +1,23 @@
 import { api } from "@/services/api"
-import type { CreateCustomerInput, Customer } from "../types/customer"
+import type {
+  CreateCustomerInput,
+  Customer,
+  CustomerProfile,
+  LoyaltyActivity,
+  LoyaltyCard,
+  LoyaltyProgram,
+  ProgressLedgerEntry,
+  Reward,
+} from "../types/customer"
+
+async function safeGet<T>(url: string): Promise<T | null> {
+  try {
+    const response = await api.get<T>(url)
+    return response.data
+  } catch {
+    return null
+  }
+}
 
 export const customerService = {
   async getCustomers(): Promise<Customer[]> {
@@ -10,6 +28,30 @@ export const customerService = {
   async getCustomer(customerId: number): Promise<Customer> {
     const response = await api.get(`/customers/${customerId}`)
     return response.data
+  },
+
+  async getCustomerProfile(customerId: number): Promise<CustomerProfile> {
+    const customer = await this.getCustomer(customerId)
+
+    const [loyaltyCard, loyaltyProgram, rewards, activities, progressLedger] =
+      await Promise.all([
+        safeGet<LoyaltyCard>(`/loyalty-cards/customer/${customerId}`),
+        safeGet<LoyaltyProgram>("/loyalty-program/me"),
+        safeGet<Reward[]>("/rewards"),
+        safeGet<LoyaltyActivity[]>(`/loyalty-activities/customer/${customerId}`),
+        safeGet<ProgressLedgerEntry[]>(
+          `/progress-ledger/customer/${customerId}`
+        ),
+      ])
+
+    return {
+      customer,
+      loyaltyCard,
+      loyaltyProgram,
+      rewards: rewards ?? [],
+      activities: activities ?? [],
+      progressLedger: progressLedger ?? [],
+    }
   },
 
   async createCustomer(data: CreateCustomerInput): Promise<Customer> {
