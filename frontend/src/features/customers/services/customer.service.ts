@@ -1,11 +1,14 @@
 import { api } from "@/services/api"
 import type {
   CreateCustomerInput,
+  CreateLoyaltyActivityInput,
   Customer,
   CustomerProfile,
   LoyaltyActivity,
+  LoyaltyActivityResult,
   LoyaltyCard,
   LoyaltyProgram,
+  ManualProgressAdjustmentInput,
   ProgressLedgerEntry,
   Reward,
 } from "../types/customer"
@@ -69,5 +72,27 @@ export const customerService = {
 
   async deleteCustomer(customerId: number): Promise<void> {
     await api.delete(`/customers/${customerId}`)
+  },
+
+  async createLoyaltyActivity(
+    data: CreateLoyaltyActivityInput
+  ): Promise<LoyaltyActivityResult> {
+    const response = await api.post<LoyaltyActivityResult>(
+      "/loyalty-activities",
+      data
+    )
+
+    return response.data
+  },
+
+  async createManualProgressAdjustment(
+    data: ManualProgressAdjustmentInput
+  ): Promise<ProgressLedgerEntry> {
+    const response = await api.post<ProgressLedgerEntry>(
+      "/progress-ledger",
+      data
+    )
+
+    return response.data
   },
 }

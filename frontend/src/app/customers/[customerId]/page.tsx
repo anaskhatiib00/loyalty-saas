@@ -15,6 +15,7 @@ import { DashboardShell } from "@/components/layout/DashboardShell"
 import {
   CustomerActivityTimeline,
   CustomerDigitalCard,
+  CustomerOperations,
   CustomerProfileHeader,
   CustomerProgressPanel,
   CustomerWalletPanel,
@@ -43,6 +44,17 @@ export default function CustomerDetailsPage() {
       setError("Could not load customer profile.")
     } finally {
       setLoading(false)
+    }
+  }, [customerId])
+
+  const refreshCustomerProfile = useCallback(async () => {
+    try {
+      setError(null)
+
+      const profile = await customerService.getCustomerProfile(customerId)
+      setProfile(profile)
+    } catch {
+      setError("Could not refresh customer profile.")
     }
   }, [customerId])
 
@@ -86,7 +98,7 @@ export default function CustomerDetailsPage() {
           <>
             <CustomerProfileHeader
               customer={profile.customer}
-              onCustomerUpdated={fetchCustomerProfile}
+              onCustomerUpdated={refreshCustomerProfile}
               onCustomerDeleted={() => router.push("/customers")}
             />
 
@@ -118,6 +130,14 @@ export default function CustomerDetailsPage() {
                 value={profile.customer.total_rewards_redeemed ?? 0}
               />
             </div>
+
+            <CustomerOperations
+              customer={profile.customer}
+              loyaltyCard={profile.loyaltyCard}
+              loyaltyProgram={profile.loyaltyProgram}
+              activities={profile.activities}
+              onActionCompleted={refreshCustomerProfile}
+            />
 
             <div className="grid gap-6 xl:grid-cols-2">
               <CustomerWalletPanel loyaltyCard={profile.loyaltyCard} />

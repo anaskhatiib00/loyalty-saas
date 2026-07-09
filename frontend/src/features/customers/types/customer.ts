@@ -64,7 +64,7 @@ export type LoyaltyActivity = {
   employee_id: number | null
   customer_id: number
   loyalty_card_id: number
-  activity_type: string
+  activity_type: LoyaltyActivityType
   status: string
   purchase_amount: number
   qualifying_quantity: number
@@ -79,7 +79,7 @@ export type ProgressLedgerEntry = {
   customer_id: number
   change_amount: number
   balance_after: number
-  entry_type: string
+  entry_type: LedgerEntryType
   reference_type: string | null
   reference_id: string | null
   note: string | null
@@ -92,4 +92,47 @@ export type CustomerProfile = {
   rewards: Reward[]
   activities: LoyaltyActivity[]
   progressLedger: ProgressLedgerEntry[]
+}
+
+export type LoyaltyActivityType =
+  | "purchase"
+  | "visit"
+  | "stamp_scan"
+  | "product_purchase"
+  | "manual_adjustment"
+  | "reward_redemption"
+
+export type LedgerEntryType =
+  | "purchase"
+  | "bonus"
+  | "redemption"
+  | "refund"
+  | "adjustment"
+  | "campaign"
+  | "welcome"
+  | "birthday"
+  | "referral"
+
+export type CreateLoyaltyActivityInput = {
+  loyalty_card_identifier: string
+  location_id: number
+  employee_id?: number
+  activity_type: LoyaltyActivityType
+  purchase_amount?: number
+  qualifying_quantity?: number
+  note?: string
+}
+
+export type LoyaltyActivityResult = {
+  activity: LoyaltyActivity
+  unlocked_rewards: Reward[]
+}
+
+export type ManualProgressAdjustmentInput = {
+  customer_id: number
+  change_amount: number
+  entry_type: LedgerEntryType
+  reference_type?: string
+  reference_id?: string
+  note: string
 }

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.enums import LedgerEntryType
+from app.core.enums import LedgerEntryType, ProgramType
 from app.loyalty.engine import calculate_loyalty_progress
 from app.models.user import User
 from app.repositories.business_repository import get_business_by_owner_id
@@ -10,8 +10,8 @@ from app.repositories.employee_repository import get_employee_by_id
 from app.repositories.location_repository import get_location_by_id
 from app.repositories.loyalty_activity_repository import create_loyalty_activity
 from app.repositories.loyalty_card_repository import (
-    get_loyalty_card_by_public_id,
     get_loyalty_card_by_card_number,
+    get_loyalty_card_by_public_id,
 )
 from app.repositories.loyalty_program_repository import get_loyalty_program_by_business_id
 from app.repositories.progress_ledger_repository import create_ledger_entry
@@ -68,7 +68,24 @@ def process_loyalty_activity_use_case(
         quantity=activity_data.qualifying_quantity,
     )
 
-    customer.current_progress = engine_result["new_progress"]
+    earned_progress = engine_result["earned_progress"]
+    calculated_progress = engine_result["new_progress"]
+    unlocked_rewards = engine_result["unlocked_rewards"]
+
+    reward_was_collected = (
+        program.program_type == ProgramType.STAMPS
+        and program.target_count is not None
+        and calculated_progress >= program.target_count
+    )
+
+    if reward_was_collected:
+        final_progress = 0
+        actual_change = program.target_count - customer.current_progress
+    else:
+        final_progress = calculated_progress
+        actual_change = earned_progress
+
+    customer.current_progress = final_progress
 
     activity = create_loyalty_activity(
         db=db,
@@ -80,22 +97,51 @@ def process_loyalty_activity_use_case(
         activity_type=activity_data.activity_type,
         purchase_amount=activity_data.purchase_amount,
         qualifying_quantity=activity_data.qualifying_quantity,
-        earned_progress=engine_result["earned_progress"],
-        balance_after=engine_result["new_progress"],
+        earned_progress=actual_change,
+        balance_after=final_progress,
         note=activity_data.note,
     )
 
-    create_ledger_entry(
-        db=db,
-        business_id=business.id,
-        customer_id=customer.id,
-        change_amount=engine_result["earned_progress"],
-        balance_after=engine_result["new_progress"],
-        entry_type=LedgerEntryType.PURCHASE,
-        reference_type="loyalty_activity",
-        reference_id=str(activity.id),
-        note=activity_data.note,
-    )
+    if reward_was_collected:
+        create_ledger_entry(
+            db=db,
+            business_id=business.id,
+            customer_id=customer.id,
+            change_amount=actual_change,
+            balance_after=program.target_count,
+            entry_type=LedgerEntryType.PURCHASE,
+            reference_type="loyalty_activity",
+            reference_id=str(activity.id),
+            note=activity_data.note,
+        )
+
+        create_ledger_entry(
+            db=db,
+            business_id=business.id,
+            customer_id=customer.id,
+            change_amount=-program.target_count,
+            balance_after=final_progress,
+            entry_type=LedgerEntryType.REDEMPTION,
+            reference_type="reward_collected",
+            reference_id=str(activity.id),
+            note=(
+                unlocked_rewards[0].get("name", "Reward collected")
+                if unlocked_rewards
+                else "Reward collected"
+            ),
+        )
+    else:
+        create_ledger_entry(
+            db=db,
+            business_id=business.id,
+            customer_id=customer.id,
+            change_amount=actual_change,
+            balance_after=final_progress,
+            entry_type=LedgerEntryType.PURCHASE,
+            reference_type="loyalty_activity",
+            reference_id=str(activity.id),
+            note=activity_data.note,
+        )
 
     db.add(customer)
     db.commit()
@@ -103,5 +149,6 @@ def process_loyalty_activity_use_case(
 
     return {
         "activity": activity,
-        "unlocked_rewards": engine_result["unlocked_rewards"],
+        "unlocked_rewards": unlocked_rewards,
+        "reward_collected": reward_was_collected,
     }
