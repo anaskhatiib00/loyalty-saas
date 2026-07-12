@@ -72,3 +72,41 @@ If users need instructions for a common task, the design should be improved.
 
 
 Every line of code should make the product easier to use, easier to maintain, or easier to grow. If it does none of those things, question whether it belongs.
+
+
+## 4. Split by Responsibility, Not by Line Count
+
+File size is a signal, not a rule.
+
+Do not split a file simply because it exceeds an arbitrary number of lines.
+
+Split a file when doing so improves:
+
+- responsibility
+- readability
+- reuse
+- testability
+- maintainability
+
+A 200-line file with one clear responsibility can be healthier than five small files with unclear boundaries.
+
+Examples:
+
+A database model may be long because it defines columns, constraints, indexes, and relationships. That is still one responsibility.
+
+A transaction executor may be longer because several steps must succeed or fail within the same database transaction. Splitting those steps carelessly may weaken transaction safety.
+
+A UI component should usually remain smaller because presentation responsibilities are easier to isolate and compose.
+
+Use line count as a reason to review a file, not as an automatic reason to refactor it.
+
+Refactor when a file begins to:
+
+- handle unrelated business workflows
+- mix presentation with API or business logic
+- contain branches that belong to separate domain strategies
+- become difficult to test independently
+- hide the main workflow
+- create unclear transaction ownership
+
+Optimize for clear ownership, not the smallest possible files.

@@ -40,3 +40,7 @@ def update_employee(db: Session, employee: Employee, employee_data: EmployeeUpda
 def delete_employee(db: Session, employee: Employee):
     db.delete(employee)
     db.commit()
+
+
+def get_employee_by_user_id(db: Session, user_id: int):
+    return db.query(Employee).filter(Employee.user_id == user_id).first()

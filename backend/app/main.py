@@ -1,39 +1,26 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-
-from app.api.v1.auth import router as auth_router
-from app.api.v1.business import router as business_router
-
-from app.db.database import engine
-
-from app.api.v1.location import router as location_router
-
-from app.api.v1.loyalty_program import router as loyalty_program_router
-
-from app.api.v1.reward import router as reward_router
-
-from app.api.v1.customer import router as customer_router
-
-from app.api.v1.progress_ledger import router as progress_ledger_router
-
-from app.api.v1.loyalty_card import router as loyalty_card_router
-
-from app.api.v1.employee import router as employee_router
-
-from app.api.v1.loyalty_activity import router as loyalty_activity_router
-
-from app.api.v1.scan import router as scan_router
-
-from app.api.v1.credential import router as credential_router
 
 from app.api.v1.apple_wallet.web_service import (
     router as apple_wallet_router,
 )
+from app.api.v1.auth import router as auth_router
+from app.api.v1.business import router as business_router
+from app.api.v1.credential import router as credential_router
+from app.api.v1.customer import router as customer_router
+from app.api.v1.employee import router as employee_router
+from app.api.v1.location import router as location_router
+from app.api.v1.loyalty_activity import router as loyalty_activity_router
+from app.api.v1.loyalty_card import router as loyalty_card_router
+from app.api.v1.loyalty_program import router as loyalty_program_router
+from app.api.v1.manager_activity import router as manager_activity_router
+from app.api.v1.pos import router as pos_router
+from app.api.v1.progress_ledger import router as progress_ledger_router
+from app.api.v1.reward import router as reward_router
+from app.api.v1.scan import router as scan_router
+from app.db.database import engine
 
-from fastapi.middleware.cors import CORSMiddleware
-
-
-#Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Loyalty SaaS API",
@@ -63,8 +50,10 @@ app.include_router(loyalty_card_router)
 app.include_router(employee_router)
 app.include_router(loyalty_activity_router)
 app.include_router(scan_router)
+app.include_router(pos_router)
 app.include_router(credential_router)
 app.include_router(apple_wallet_router)
+app.include_router(manager_activity_router)
 
 
 @app.get("/")

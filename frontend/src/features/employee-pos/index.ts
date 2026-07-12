@@ -1,0 +1,1 @@
+export { EmployeePOS } from "./components/EmployeePOS"

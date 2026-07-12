@@ -13,7 +13,7 @@ def create_ledger_entry(
     reference_type: str | None = None,
     reference_id: str | None = None,
     note: str | None = None,
-):
+) -> ProgressLedger:
     entry = ProgressLedger(
         business_id=business_id,
         customer_id=customer_id,
@@ -26,13 +26,15 @@ def create_ledger_entry(
     )
 
     db.add(entry)
-    db.commit()
-    db.refresh(entry)
+    db.flush()
 
     return entry
 
 
-def get_ledger_by_customer_id(db: Session, customer_id: int):
+def get_ledger_by_customer_id(
+    db: Session,
+    customer_id: int,
+) -> list[ProgressLedger]:
     return (
         db.query(ProgressLedger)
         .filter(ProgressLedger.customer_id == customer_id)

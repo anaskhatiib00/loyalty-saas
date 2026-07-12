@@ -8,6 +8,10 @@ def get_business_by_owner_id(db: Session, owner_id: int):
     return db.query(Business).filter(Business.owner_id == owner_id).first()
 
 
+def get_business_by_id(db: Session, business_id: int):
+    return db.query(Business).filter(Business.id == business_id).first()
+
+
 def create_business(db: Session, owner_id: int, business_data: BusinessCreate):
     business = Business(
         owner_id=owner_id,

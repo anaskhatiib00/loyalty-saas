@@ -12,6 +12,7 @@ class Employee(Base):
 
     business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
     location_id = Column(Integer, ForeignKey("locations.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, unique=True)
 
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=True)
@@ -24,3 +25,4 @@ class Employee(Base):
 
     business = relationship("Business")
     location = relationship("Location")
+    
