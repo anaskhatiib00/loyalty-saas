@@ -165,3 +165,8 @@ class ResolvedRegionalConfigurationResponse(BaseModel):
     currency_code: str
     timezone: str
     locale: str
+
+
+class BusinessSettingsDetailsResponse(BaseModel):
+    settings: BusinessSettingsResponse
+    resolved: ResolvedRegionalConfigurationResponse

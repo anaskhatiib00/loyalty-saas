@@ -15,6 +15,16 @@ from app.services.business_service import (
     update_my_business_service,
 )
 
+from app.schemas.business_settings import (
+    BusinessSettingsDetailsResponse,
+    BusinessSettingsUpdate,
+)
+
+from app.services.business_settings_service import (
+    get_my_business_settings_service,
+    update_my_business_settings_service,
+)
+
 
 router = APIRouter(
     prefix="/business",
@@ -46,3 +56,33 @@ def update_my_business(
     current_user: User = Depends(get_current_user),
 ):
     return update_my_business_service(db, current_user, business_data)
+
+
+@router.get(
+    "/settings",
+    response_model=BusinessSettingsDetailsResponse,
+)
+def get_my_business_settings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_my_business_settings_service(
+        db,
+        current_user,
+    )
+
+
+@router.patch(
+    "/settings",
+    response_model=BusinessSettingsDetailsResponse,
+)
+def update_my_business_settings(
+    settings_data: BusinessSettingsUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return update_my_business_settings_service(
+        db,
+        current_user,
+        settings_data,
+    )

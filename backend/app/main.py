@@ -10,6 +10,7 @@ from app.api.v1.business import router as business_router
 from app.api.v1.credential import router as credential_router
 from app.api.v1.customer import router as customer_router
 from app.api.v1.employee import router as employee_router
+from app.api.v1.international import router as international_router
 from app.api.v1.location import router as location_router
 from app.api.v1.loyalty_activity import router as loyalty_activity_router
 from app.api.v1.loyalty_card import router as loyalty_card_router
@@ -41,6 +42,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(business_router)
+app.include_router(international_router)
 app.include_router(location_router)
 app.include_router(loyalty_program_router)
 app.include_router(reward_router)
