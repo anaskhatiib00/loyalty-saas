@@ -25,6 +25,14 @@ class Business(Base):
     rewards = relationship("Reward", back_populates="business")
     locations = relationship("Location", back_populates="business")
 
+    settings = relationship(
+        "BusinessSettings",
+        back_populates="business",
+        uselist=False,
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
     loyalty_program = relationship(
         "LoyaltyProgram",
         back_populates="business",

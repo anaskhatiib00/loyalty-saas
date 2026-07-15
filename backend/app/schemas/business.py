@@ -1,5 +1,11 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
+from app.schemas.business_settings import (
+    BusinessSettingsCreate,
+    BusinessSettingsResponse,
+)
 
 
 class BusinessCreate(BaseModel):
@@ -9,6 +15,7 @@ class BusinessCreate(BaseModel):
     address: Optional[str] = None
     logo_url: Optional[str] = None
     brand_color: str = "#000000"
+    settings: BusinessSettingsCreate
 
 
 class BusinessUpdate(BaseModel):
@@ -21,6 +28,8 @@ class BusinessUpdate(BaseModel):
 
 
 class BusinessResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     owner_id: int
     name: str
@@ -29,6 +38,4 @@ class BusinessResponse(BaseModel):
     address: Optional[str]
     logo_url: Optional[str]
     brand_color: str
-
-    class Config:
-        from_attributes = True
+    settings: BusinessSettingsResponse
