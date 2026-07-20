@@ -10,9 +10,26 @@ class Employee(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
-    location_id = Column(Integer, ForeignKey("locations.id"), nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, unique=True)
+    business_id = Column(
+        Integer,
+        ForeignKey("businesses.id"),
+        nullable=False,
+    )
+
+    # Temporary compatibility field.
+    # This will remain until the POS flow uses an active location.
+    location_id = Column(
+        Integer,
+        ForeignKey("locations.id"),
+        nullable=True,
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+        unique=True,
+    )
 
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=True)
@@ -21,8 +38,23 @@ class Employee(Base):
     role = Column(String, default="cashier")
     status = Column(String, default="active")
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
 
     business = relationship("Business")
-    location = relationship("Location")
-    
+
+    # Temporary legacy relationship used by the current POS flow.
+    location = relationship(
+        "Location",
+        foreign_keys=[location_id],
+    )
+
+    # New many-to-many assignment relationship.
+    location_assignments = relationship(
+        "EmployeeLocation",
+        back_populates="employee",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
