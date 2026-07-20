@@ -1,65 +1,60 @@
-export type POSCustomer = {
-  id: number
-  first_name: string
-  last_name: string | null
-  phone: string | null
-  email: string | null
-  current_progress: number
-  is_active: boolean
-}
-
-export type POSLoyaltyCard = {
-  id: number
-  card_number: string
-  public_id: string
-  status: string
-}
-
-export type ScanResolveResponse = {
-  loyalty_card: POSLoyaltyCard
-  customer: POSCustomer
-}
-
-export type POSActivityType =
-  | "purchase"
-  | "visit"
-  | "stamp_scan"
-  | "product_purchase"
-
-export type POSActivityInput = {
+export type POSScanRequest = {
   loyalty_card_identifier: string
-  location_id: number
-  employee_id?: number
-  activity_type: POSActivityType
-  purchase_amount?: number
-  qualifying_quantity?: number
-  note?: string
 }
 
-export type POSUnlockedReward = {
+export type POSReward = {
   id: number
   name: string
   description: string | null
-  required_value: number
   reward_type: string
   reward_value: string | null
+  required_value: number
 }
 
-export type POSActivityResult = {
-  activity: Record<string, never>
-  unlocked_rewards: POSUnlockedReward[]
-  reward_collected?: boolean
+export type POSScanResponse = {
+  customer_id: number
+  loyalty_card_id: number
+  program_type: string
+  current_progress: number
+  reward_available: boolean
+  reward_collected: boolean
+  unlocked_rewards: POSReward[]
 }
 
-export type POSLocation = {
+export type POSActivityItem = {
   id: number
-  business_id: number
-  name: string
-  phone: string | null
-  address: string
-  city: string | null
-  state: string | null
-  country: string | null
-  postal_code: string | null
-  is_default: boolean
+
+  customer_id: number
+  customer_name: string
+
+  employee_id: number
+  employee_name: string
+
+  location_id: number
+  location_name: string
+
+  program_type: string
+  event_type: string
+  activity_type: string
+  source: string
+
+  progress_change: number
+  balance_before: number
+  balance_after: number
+
+  reward_id: number | null
+  reward_name: string | null
+
+  created_at: string
+}
+
+export type POSRecentActivityResponse = {
+  employee_id: number
+  employee_name: string
+
+  location_id: number
+  location_name: string
+
+  total_activities: number
+  activities: POSActivityItem[]
 }
