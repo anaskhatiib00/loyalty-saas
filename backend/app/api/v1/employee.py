@@ -26,7 +26,11 @@ from app.services.identity_invitation_service import (
     accept_identity_invitation_service,
     create_identity_invitation_service,
 )
-
+from app.application.authorization.dependencies import require_permission
+from app.application.authorization.permissions import Permission
+from app.application.identity.current_business_context import (
+    CurrentBusinessContext,
+)
 
 router = APIRouter(
     prefix="/employees",
@@ -38,9 +42,15 @@ router = APIRouter(
 def create_employee(
     employee_data: EmployeeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_CREATE)
+    ),
 ):
-    return create_employee_service(db, current_user, employee_data)
+    return create_employee_service(
+        db,
+        context.business.id,
+        employee_data,
+)
 
 
 @router.post(

@@ -35,14 +35,20 @@ def validate_location(db: Session, business_id: int, location_id: int | None):
 
 def create_employee_service(
     db: Session,
-    current_user: User,
+    business_id: int,
     employee_data: EmployeeCreate,
 ):
-    business = get_current_user_business(db, current_user)
+    validate_location(
+        db,
+        business_id,
+        employee_data.location_id,
+    )
 
-    validate_location(db, business.id, employee_data.location_id)
-
-    return create_employee(db, business.id, employee_data)
+    return create_employee(
+        db,
+        business_id,
+        employee_data,
+    )
 
 
 def list_employees_service(db: Session, current_user: User):
