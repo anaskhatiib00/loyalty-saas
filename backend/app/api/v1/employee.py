@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
 from app.db.database import get_db
-from app.models.user import User
 from app.schemas.employee import (
     EmployeeCreate,
     EmployeeResponse,
@@ -61,11 +59,14 @@ def create_employee(
 def invite_employee(
     invitation_data: IdentityInvitationCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_INVITE)
+    ),
 ):
     result = create_identity_invitation_service(
         db,
-        current_user=current_user,
+        business_id=context.business.id,
+        created_by_user_id=context.user.id,
         invitation_data=invitation_data,
     )
 
@@ -74,7 +75,6 @@ def invite_employee(
         "employee_id": result.invitation.employee_id,
         "delivery_status": "pending",
     }
-
 
 @router.post(
     "/invitations/accept",
@@ -94,18 +94,29 @@ def accept_employee_invitation(
 @router.get("", response_model=list[EmployeeResponse])
 def list_employees(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_READ)
+    ),
 ):
-    return list_employees_service(db, current_user)
+    return list_employees_service(
+        db,
+        context.business.id,
+    )
 
 
 @router.get("/{employee_id}", response_model=EmployeeResponse)
 def get_employee(
     employee_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_READ)
+    ),
 ):
-    return get_employee_service(db, current_user, employee_id)
+    return get_employee_service(
+        db,
+        context.business.id,
+        employee_id,
+    )
 
 
 @router.patch("/{employee_id}", response_model=EmployeeResponse)
@@ -113,11 +124,13 @@ def update_employee(
     employee_id: int,
     employee_data: EmployeeUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_UPDATE)
+    ),
 ):
     return update_employee_service(
         db,
-        current_user,
+        context.business.id,
         employee_id,
         employee_data,
     )
@@ -127,10 +140,12 @@ def update_employee(
 def delete_employee(
     employee_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_DELETE)
+    ),
 ):
     return delete_employee_service(
         db,
-        current_user,
+        context.business.id,
         employee_id,
     )

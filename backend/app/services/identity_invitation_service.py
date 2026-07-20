@@ -11,8 +11,6 @@ from app.core.identity_tokens import (
 )
 from app.core.settings import settings
 from app.models.identity_invitation import IdentityInvitation
-from app.models.user import User
-from app.repositories.business_repository import get_business_by_owner_id
 from app.repositories.employee_repository import (
     create_employee_in_transaction,
     get_employee_by_business_email,
@@ -21,8 +19,8 @@ from app.repositories.identity_invitation_repository import (
     create_identity_invitation,
     get_pending_identity_invitation_by_business_email,
 )
-from app.repositories.user_repository import get_user_by_email
 from app.repositories.location_repository import get_location_by_id
+from app.repositories.user_repository import get_user_by_email
 from app.schemas.identity_invitation import IdentityInvitationCreate
 
 
@@ -30,18 +28,6 @@ from app.schemas.identity_invitation import IdentityInvitationCreate
 class CreatedIdentityInvitation:
     invitation: IdentityInvitation
     raw_token: str
-
-
-def _get_owned_business(db: Session, current_user: User):
-    business = get_business_by_owner_id(db, current_user.id)
-
-    if not business:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only a business owner can invite employees",
-        )
-
-    return business
 
 
 def _validate_invitation_location(
@@ -53,7 +39,10 @@ def _validate_invitation_location(
     if location_id is None:
         return
 
-    location = get_location_by_id(db, location_id)
+    location = get_location_by_id(
+        db,
+        location_id,
+    )
 
     if not location or location.business_id != business_id:
         raise HTTPException(
@@ -68,7 +57,10 @@ def _validate_email_availability(
     business_id: int,
     email: str,
 ) -> None:
-    existing_user = get_user_by_email(db, email)
+    existing_user = get_user_by_email(
+        db,
+        email,
+    )
 
     if existing_user:
         raise HTTPException(
@@ -106,22 +98,23 @@ def _validate_email_availability(
 def create_identity_invitation_service(
     db: Session,
     *,
-    current_user: User,
+    business_id: int,
+    created_by_user_id: int,
     invitation_data: IdentityInvitationCreate,
 ) -> CreatedIdentityInvitation:
-    business = _get_owned_business(db, current_user)
-
     _validate_invitation_location(
         db,
-        business_id=business.id,
+        business_id=business_id,
         location_id=invitation_data.location_id,
     )
 
-    normalized_email = str(invitation_data.email).strip().lower()
+    normalized_email = str(
+        invitation_data.email
+    ).strip().lower()
 
     _validate_email_availability(
         db,
-        business_id=business.id,
+        business_id=business_id,
         email=normalized_email,
     )
 
@@ -136,7 +129,7 @@ def create_identity_invitation_service(
     try:
         employee = create_employee_in_transaction(
             db,
-            business_id=business.id,
+            business_id=business_id,
             location_id=invitation_data.location_id,
             full_name=invitation_data.full_name,
             email=normalized_email,
@@ -146,16 +139,17 @@ def create_identity_invitation_service(
 
         invitation = create_identity_invitation(
             db,
-            business_id=business.id,
+            business_id=business_id,
             employee_id=employee.id,
             email=normalized_email,
             role=invitation_data.role.value,
             token_hash=token_hash,
             expires_at=expires_at,
-            created_by_user_id=current_user.id,
+            created_by_user_id=created_by_user_id,
         )
 
         db.commit()
+
         db.refresh(employee)
         db.refresh(invitation)
 
@@ -169,7 +163,10 @@ def create_identity_invitation_service(
 
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="The employee invitation conflicts with existing identity data",
+            detail=(
+                "The employee invitation conflicts with "
+                "existing identity data"
+            ),
         ) from exc
 
     except HTTPException:
@@ -234,7 +231,9 @@ def accept_identity_invitation_service(
     expires_at = invitation.expires_at
 
     if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
+        expires_at = expires_at.replace(
+            tzinfo=timezone.utc,
+        )
 
     if expires_at <= now:
         try:
@@ -243,6 +242,7 @@ def accept_identity_invitation_service(
                 invitation,
             )
             db.commit()
+
         except SQLAlchemyError:
             db.rollback()
 
@@ -271,7 +271,10 @@ def accept_identity_invitation_service(
     if employee.business_id != invitation.business_id:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Invitation employee does not belong to the invitation business",
+            detail=(
+                "Invitation employee does not belong to "
+                "the invitation business"
+            ),
         )
 
     if employee.email is None or (
@@ -345,7 +348,10 @@ def accept_identity_invitation_service(
 
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Unable to create the employee user account because identity data already exists",
+            detail=(
+                "Unable to create the employee user account "
+                "because identity data already exists"
+            ),
         ) from exc
 
     except HTTPException:

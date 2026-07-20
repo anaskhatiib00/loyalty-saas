@@ -51,41 +51,76 @@ def create_employee_service(
     )
 
 
-def list_employees_service(db: Session, current_user: User):
-    business = get_current_user_business(db, current_user)
+def list_employees_service(
+    db: Session,
+    business_id: int,
+):
+    return get_employees_by_business_id(
+        db,
+        business_id,
+    )
 
-    return get_employees_by_business_id(db, business.id)
 
+def get_employee_service(
+    db: Session,
+    business_id: int,
+    employee_id: int,
+):
+    employee = get_employee_by_id(
+        db,
+        employee_id,
+    )
 
-def get_employee_service(db: Session, current_user: User, employee_id: int):
-    business = get_current_user_business(db, current_user)
-
-    employee = get_employee_by_id(db, employee_id)
-
-    if not employee or employee.business_id != business.id:
-        raise HTTPException(status_code=404, detail="Employee not found")
+    if not employee or employee.business_id != business_id:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found",
+        )
 
     return employee
 
 
 def update_employee_service(
     db: Session,
-    current_user: User,
+    business_id: int,
     employee_id: int,
     employee_data: EmployeeUpdate,
 ):
-    business = get_current_user_business(db, current_user)
+    validate_location(
+        db,
+        business_id,
+        employee_data.location_id,
+    )
 
-    validate_location(db, business.id, employee_data.location_id)
+    employee = get_employee_service(
+        db,
+        business_id,
+        employee_id,
+    )
 
-    employee = get_employee_service(db, current_user, employee_id)
+    return update_employee(
+        db,
+        employee,
+        employee_data,
+    )
 
-    return update_employee(db, employee, employee_data)
 
+def delete_employee_service(
+    db: Session,
+    business_id: int,
+    employee_id: int,
+):
+    employee = get_employee_service(
+        db,
+        business_id,
+        employee_id,
+    )
 
-def delete_employee_service(db: Session, current_user: User, employee_id: int):
-    employee = get_employee_service(db, current_user, employee_id)
+    delete_employee(
+        db,
+        employee,
+    )
 
-    delete_employee(db, employee)
-
-    return {"message": "Employee deleted successfully"}
+    return {
+        "message": "Employee deleted successfully",
+    }
