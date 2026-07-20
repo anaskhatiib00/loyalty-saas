@@ -12,3 +12,4 @@ from app.models.loyalty_activity import LoyaltyActivity
 from app.models.credential import Credential
 from app.models.apple_wallet_registration import AppleWalletRegistration
 from app.models.business_settings import BusinessSettings
+from app.models.identity_invitation import IdentityInvitation

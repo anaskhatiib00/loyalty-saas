@@ -45,6 +45,11 @@ class LedgerEntryType(str, Enum):
     WELCOME = "welcome"
     BIRTHDAY = "birthday"
     REFERRAL = "referral"
+
+
+class UserRole(str, Enum):
+    BUSINESS_OWNER = "business_owner"
+    EMPLOYEE = "employee"
     
     
 class EmployeeRole(str, Enum):
@@ -54,8 +59,16 @@ class EmployeeRole(str, Enum):
 
 
 class EmployeeStatus(str, Enum):
+    INVITED = "invited"
     ACTIVE = "active"
     INACTIVE = "inactive"
+
+
+class IdentityInvitationStatus(str, Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REVOKED = "revoked"
+    EXPIRED = "expired"
 
 
 class LoyaltyActivityType(str, Enum):
