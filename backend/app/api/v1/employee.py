@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.application.authorization.dependencies import require_permission
+from app.application.authorization.permissions import Permission
+from app.application.identity.current_business_context import (
+    CurrentBusinessContext,
+)
 from app.db.database import get_db
 from app.schemas.employee import (
     EmployeeCreate,
@@ -24,11 +29,7 @@ from app.services.identity_invitation_service import (
     accept_identity_invitation_service,
     create_identity_invitation_service,
 )
-from app.application.authorization.dependencies import require_permission
-from app.application.authorization.permissions import Permission
-from app.application.identity.current_business_context import (
-    CurrentBusinessContext,
-)
+
 
 router = APIRouter(
     prefix="/employees",
@@ -48,7 +49,7 @@ def create_employee(
         db,
         context.business.id,
         employee_data,
-)
+    )
 
 
 @router.post(
@@ -75,6 +76,7 @@ def invite_employee(
         "employee_id": result.invitation.employee_id,
         "delivery_status": "pending",
     }
+
 
 @router.post(
     "/invitations/accept",

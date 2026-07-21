@@ -10,6 +10,9 @@ from app.api.v1.business import router as business_router
 from app.api.v1.credential import router as credential_router
 from app.api.v1.customer import router as customer_router
 from app.api.v1.employee import router as employee_router
+from app.api.v1.employee_location import (
+    router as employee_location_router,
+)
 from app.api.v1.international import router as international_router
 from app.api.v1.location import router as location_router
 from app.api.v1.loyalty_activity import router as loyalty_activity_router
@@ -50,6 +53,7 @@ app.include_router(customer_router)
 app.include_router(progress_ledger_router)
 app.include_router(loyalty_card_router)
 app.include_router(employee_router)
+app.include_router(employee_location_router)
 app.include_router(loyalty_activity_router)
 app.include_router(scan_router)
 app.include_router(pos_router)
