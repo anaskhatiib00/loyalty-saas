@@ -63,6 +63,25 @@ def get_primary_employee_location_assignment(
     )
 
 
+def get_current_employee_location_assignment(
+    db: Session,
+    *,
+    employee_id: int,
+) -> EmployeeLocation | None:
+    """
+    Return the employee's current active operating location.
+    """
+    return (
+        db.query(EmployeeLocation)
+        .filter(
+            EmployeeLocation.employee_id == employee_id,
+            EmployeeLocation.is_active.is_(True),
+            EmployeeLocation.is_current.is_(True),
+        )
+        .first()
+    )
+
+
 def get_employee_location_assignments(
     db: Session,
     *,
@@ -80,10 +99,13 @@ def get_employee_location_assignments(
     )
 
     if not include_inactive:
-        query = query.filter(EmployeeLocation.is_active.is_(True))
+        query = query.filter(
+            EmployeeLocation.is_active.is_(True),
+        )
 
     return (
         query.order_by(
+            EmployeeLocation.is_current.desc(),
             EmployeeLocation.is_primary.desc(),
             EmployeeLocation.assigned_at.asc(),
             EmployeeLocation.id.asc(),
@@ -126,6 +148,7 @@ def create_employee_location_assignment(
         location_id=location_id,
         assigned_by_user_id=assigned_by_user_id,
         is_primary=is_primary,
+        is_current=False,
         is_active=True,
     )
 
@@ -148,6 +171,7 @@ def reactivate_employee_location_assignment(
     assignment.assigned_by_user_id = assigned_by_user_id
     assignment.assigned_at = datetime.now(timezone.utc)
     assignment.is_primary = is_primary
+    assignment.is_current = False
     assignment.is_active = True
 
     db.flush()
@@ -176,7 +200,39 @@ def clear_primary_employee_location_assignments(
         )
 
     query.update(
-        {EmployeeLocation.is_primary: False},
+        {
+            EmployeeLocation.is_primary: False,
+        },
+        synchronize_session="fetch",
+    )
+
+    db.flush()
+
+
+def clear_current_employee_location_assignments(
+    db: Session,
+    *,
+    employee_id: int,
+    exclude_location_id: int | None = None,
+) -> None:
+    """
+    Remove the current operating location flag from active assignments.
+    """
+    query = db.query(EmployeeLocation).filter(
+        EmployeeLocation.employee_id == employee_id,
+        EmployeeLocation.is_active.is_(True),
+        EmployeeLocation.is_current.is_(True),
+    )
+
+    if exclude_location_id is not None:
+        query = query.filter(
+            EmployeeLocation.location_id != exclude_location_id,
+        )
+
+    query.update(
+        {
+            EmployeeLocation.is_current: False,
+        },
         synchronize_session="fetch",
     )
 
@@ -200,6 +256,23 @@ def set_employee_location_assignment_primary(
     return assignment
 
 
+def set_employee_location_assignment_current(
+    db: Session,
+    *,
+    assignment: EmployeeLocation,
+) -> EmployeeLocation:
+    """
+    Mark an assignment as the employee's current operating location.
+
+    The service layer must clear any previous current assignment first.
+    """
+    assignment.is_current = True
+
+    db.flush()
+
+    return assignment
+
+
 def deactivate_employee_location_assignment(
     db: Session,
     *,
@@ -210,6 +283,7 @@ def deactivate_employee_location_assignment(
     """
     assignment.is_active = False
     assignment.is_primary = False
+    assignment.is_current = False
 
     db.flush()
 

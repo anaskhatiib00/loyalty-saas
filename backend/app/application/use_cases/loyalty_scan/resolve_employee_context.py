@@ -11,6 +11,9 @@ from app.models.employee import Employee
 from app.models.location import Location
 from app.models.user import User
 from app.repositories.location_repository import get_location_by_id
+from app.repositories.employee_location_repository import (
+    get_current_employee_location_assignment,
+)
 
 
 @dataclass(frozen=True)
@@ -44,15 +47,20 @@ def resolve_employee_context(
             detail="Employee access is required",
         )
 
-    if employee.location_id is None:
+    current_assignment = get_current_employee_location_assignment(
+        db,
+        employee_id=employee.id,
+    )
+
+    if current_assignment is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Employee has no assigned location",
+            detail="Employee has no current operating location",
         )
 
     location = get_location_by_id(
         db,
-        employee.location_id,
+        current_assignment.location_id,
     )
 
     if location is None:

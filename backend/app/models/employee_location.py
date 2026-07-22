@@ -1,10 +1,13 @@
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Column,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -21,9 +24,23 @@ class EmployeeLocation(Base):
             "location_id",
             name="uq_employee_locations_employee_location",
         ),
+        CheckConstraint(
+            "(NOT is_current) OR is_active",
+            name="ck_employee_locations_current_requires_active",
+        ),
+        Index(
+            "uq_employee_locations_current_employee",
+            "employee_id",
+            unique=True,
+            postgresql_where=text("is_current = true"),
+        ),
     )
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
     employee_id = Column(
         Integer,
@@ -47,7 +64,10 @@ class EmployeeLocation(Base):
 
     assigned_by_user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="SET NULL",
+        ),
         nullable=True,
         index=True,
     )
@@ -59,6 +79,13 @@ class EmployeeLocation(Base):
     )
 
     is_primary = Column(
+        Boolean,
+        default=False,
+        server_default="false",
+        nullable=False,
+    )
+
+    is_current = Column(
         Boolean,
         default=False,
         server_default="false",
@@ -82,4 +109,7 @@ class EmployeeLocation(Base):
         back_populates="employee_assignments",
     )
 
-    assigned_by_user = relationship("User")
+    assigned_by_user = relationship(
+        "User",
+        foreign_keys=[assigned_by_user_id],
+    )

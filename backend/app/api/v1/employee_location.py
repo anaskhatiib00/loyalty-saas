@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.application.authorization.dependencies import require_permission
@@ -8,8 +8,14 @@ from app.application.identity.current_business_context import (
 )
 from app.db.database import get_db
 from app.schemas.employee_location import (
+    EmployeeCurrentLocationSelect,
     EmployeeLocationAssign,
     EmployeeLocationResponse,
+)
+from app.services.employee_current_location_service import (
+    clear_employee_current_location_service,
+    get_employee_current_location_service,
+    set_employee_current_location_service,
 )
 from app.services.employee_location_service import (
     assign_employee_location_service,
@@ -43,6 +49,24 @@ def list_employee_locations(
     )
 
 
+@router.get(
+    "/{employee_id}/locations/current",
+    response_model=EmployeeLocationResponse | None,
+)
+def get_employee_current_location(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_READ)
+    ),
+):
+    return get_employee_current_location_service(
+        db,
+        business_id=context.business.id,
+        employee_id=employee_id,
+    )
+
+
 @router.post(
     "/{employee_id}/locations",
     response_model=EmployeeLocationResponse,
@@ -64,6 +88,46 @@ def assign_employee_location(
         assigned_by_user_id=context.user.id,
         make_primary=assignment_data.is_primary,
     )
+
+
+@router.patch(
+    "/{employee_id}/locations/current",
+    response_model=EmployeeLocationResponse,
+)
+def set_employee_current_location(
+    employee_id: int,
+    selection_data: EmployeeCurrentLocationSelect,
+    db: Session = Depends(get_db),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_UPDATE)
+    ),
+):
+    return set_employee_current_location_service(
+        db,
+        business_id=context.business.id,
+        employee_id=employee_id,
+        location_id=selection_data.location_id,
+    )
+
+
+@router.delete(
+    "/{employee_id}/locations/current",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def clear_employee_current_location(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    context: CurrentBusinessContext = Depends(
+        require_permission(Permission.EMPLOYEES_UPDATE)
+    ),
+) -> Response:
+    clear_employee_current_location_service(
+        db,
+        business_id=context.business.id,
+        employee_id=employee_id,
+    )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.patch(
