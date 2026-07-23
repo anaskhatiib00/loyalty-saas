@@ -1,30 +1,39 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 import { useAuth } from "@/hooks/useAuth"
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
-  const [checking, setChecking] = useState(true)
+  const {
+    isAuthenticated,
+    isInitializing,
+  } = useAuth()
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token")
-
-    if (!token) {
+    if (!isInitializing && !isAuthenticated) {
       router.replace("/login")
-      return
     }
+  }, [isAuthenticated, isInitializing, router])
 
-    setChecking(false)
-  }, [router, isAuthenticated])
-
-  if (checking) {
+  if (isInitializing) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black text-sm text-white/50">
         Checking authentication...
+      </main>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black text-sm text-white/50">
+        Redirecting to login...
       </main>
     )
   }

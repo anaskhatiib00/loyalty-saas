@@ -12,7 +12,6 @@ export function useEmployeePOS() {
   const [manualCardInput, setManualCardInput] = useState("")
   const [recentActivity, setRecentActivity] =
     useState<POSRecentActivityResponse | null>(null)
-
   const [scanResult, setScanResult] =
     useState<POSScanResponse | null>(null)
 
@@ -36,40 +35,46 @@ export function useEmployeePOS() {
     }
   }, [])
 
-  const scanCard = async () => {
-  const identifier = manualCardInput.trim()
+  const scanCard = useCallback(
+    async (identifierOverride?: string) => {
+      const identifier = (
+        identifierOverride ?? manualCardInput
+      ).trim()
 
-  if (!identifier) {
-    setScanResult(null)
-    setError("Scan or enter a loyalty card first.")
-    return
-  }
+      if (!identifier) {
+        setScanResult(null)
+        setError("Scan or enter a loyalty card first.")
+        return
+      }
 
-  try {
-    setIsScanning(true)
-    setError(null)
-    setScanResult(null)
+      try {
+        setIsScanning(true)
+        setError(null)
+        setScanResult(null)
 
-    const result = await employeePOSService.scanCard({
-      loyalty_card_identifier: identifier,
-    })
+        const result = await employeePOSService.scanCard({
+          loyalty_card_identifier: identifier,
+        })
 
-    setScanResult(result)
+        setScanResult(result)
+        setManualCardInput("")
 
-    await loadRecentActivity()
-  } catch {
-    setScanResult(null)
-    setError("Unable to process this loyalty card.")
-  } finally {
-    setIsScanning(false)
-  }
-}
+        await loadRecentActivity()
+      } catch {
+        setScanResult(null)
+        setError("Unable to process this loyalty card.")
+      } finally {
+        setIsScanning(false)
+      }
+    },
+    [loadRecentActivity, manualCardInput]
+  )
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setManualCardInput("")
     setScanResult(null)
     setError(null)
-  }
+  }, [])
 
   return {
     manualCardInput,

@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    DEBUG: bool = False
+    FRONTEND_URL: str = "http://localhost:3000"
+
     IDENTITY_INVITATION_EXPIRE_HOURS: int = 72
 
     APPLE_TEAM_IDENTIFIER: str | None = None

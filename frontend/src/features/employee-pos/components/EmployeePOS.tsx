@@ -1,7 +1,7 @@
 "use client"
 
+import { useEffect } from "react"
 import {
-  Camera,
   CheckCircle2,
   Clock3,
   Loader2,
@@ -12,8 +12,7 @@ import {
 } from "lucide-react"
 
 import { useEmployeePOS } from "../hooks/useEmployeePOS"
-
-import { useEffect } from "react"
+import { CameraScanner } from "../scanner/CameraScanner"
 
 function formatActivityTime(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -41,12 +40,14 @@ export function EmployeePOS() {
     loadRecentActivity,
     reset,
   } = useEmployeePOS()
+
   useEffect(() => {
-  void loadRecentActivity()
+    void loadRecentActivity()
   }, [loadRecentActivity])
 
   const employeeName = recentActivity?.employee_name ?? "Employee"
-  const locationName = recentActivity?.location_name ?? "Loading location"
+  const locationName =
+    recentActivity?.location_name ?? "Loading location"
 
   return (
     <main className="min-h-screen bg-[#07110f] text-white">
@@ -72,7 +73,9 @@ export function EmployeePOS() {
                 <p className="text-xs uppercase tracking-wide text-white/40">
                   Signed in as
                 </p>
-                <p className="font-medium text-white">{employeeName}</p>
+                <p className="font-medium text-white">
+                  {employeeName}
+                </p>
               </div>
             </div>
 
@@ -85,7 +88,9 @@ export function EmployeePOS() {
                 <p className="text-xs uppercase tracking-wide text-white/40">
                   Location
                 </p>
-                <p className="font-medium text-white">{locationName}</p>
+                <p className="font-medium text-white">
+                  {locationName}
+                </p>
               </div>
             </div>
           </div>
@@ -103,36 +108,27 @@ export function EmployeePOS() {
               </h2>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55 sm:text-base">
-                The platform automatically identifies the employee, location,
-                loyalty program, progress, and available rewards.
+                The platform automatically identifies the employee,
+                location, loyalty program, progress, and available
+                rewards.
               </p>
             </div>
 
             <div className="mt-8 flex flex-col">
-              <button
-                type="button"
-                className="group relative flex min-h-72 w-full flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-emerald-300/20 bg-emerald-400/[0.08] px-6 text-center transition hover:border-emerald-300/40 hover:bg-emerald-400/[0.12]"
-              >
-                <div className="absolute inset-8 rounded-[1.5rem] border border-dashed border-emerald-300/20" />
-
-                <div className="relative flex size-24 items-center justify-center rounded-3xl bg-emerald-300 text-[#07110f] shadow-2xl shadow-emerald-500/20 transition group-hover:scale-105">
-                  <Camera className="size-11" />
-                </div>
-
-                <p className="relative mt-6 text-xl font-semibold">
-                  Start camera
-                </p>
-
-                <p className="relative mt-2 max-w-md text-sm leading-6 text-white/50">
-                  Camera scanning will be connected in the next milestone.
-                </p>
-              </button>
+              <CameraScanner
+                disabled={isScanning}
+                onDetected={(identifier) => {
+                  void scanCard(identifier)
+                }}
+              />
 
               <div className="my-6 flex items-center gap-4">
                 <div className="h-px flex-1 bg-white/10" />
+
                 <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
                   Manual fallback
                 </span>
+
                 <div className="h-px flex-1 bg-white/10" />
               </div>
 
@@ -143,7 +139,10 @@ export function EmployeePOS() {
                   void scanCard()
                 }}
               >
-                <label className="sr-only" htmlFor="loyalty-card-identifier">
+                <label
+                  className="sr-only"
+                  htmlFor="loyalty-card-identifier"
+                >
                   Loyalty card identifier
                 </label>
 
@@ -158,7 +157,8 @@ export function EmployeePOS() {
                       setManualCardInput(event.target.value)
                     }
                     placeholder="Enter loyalty card code"
-                    className="h-14 w-full rounded-2xl border border-white/10 bg-black/25 pl-12 pr-4 text-base text-white outline-none transition placeholder:text-white/25 focus:border-emerald-300/40 focus:ring-4 focus:ring-emerald-300/10"
+                    disabled={isScanning}
+                    className="h-14 w-full rounded-2xl border border-white/10 bg-black/25 pl-12 pr-4 text-base text-white outline-none transition placeholder:text-white/25 focus:border-emerald-300/40 focus:ring-4 focus:ring-emerald-300/10 disabled:cursor-not-allowed disabled:opacity-60"
                   />
                 </div>
 
@@ -198,7 +198,10 @@ export function EmployeePOS() {
                       </p>
 
                       <p className="mt-1 text-sm text-white/60">
-                        Program: {formatActivityLabel(scanResult.program_type)}
+                        Program:{" "}
+                        {formatActivityLabel(
+                          scanResult.program_type
+                        )}
                         {" · "}
                         Progress: {scanResult.current_progress}
                       </p>
@@ -254,6 +257,7 @@ export function EmployeePOS() {
               {isLoadingActivity ? (
                 <div className="flex h-full min-h-80 flex-col items-center justify-center text-center">
                   <Loader2 className="size-7 animate-spin text-emerald-300" />
+
                   <p className="mt-3 text-sm text-white/45">
                     Loading recent activity
                   </p>
@@ -272,13 +276,17 @@ export function EmployeePOS() {
                           </p>
 
                           <p className="mt-1 text-sm text-white/45">
-                            {formatActivityLabel(activity.activity_type)}
+                            {formatActivityLabel(
+                              activity.activity_type
+                            )}
                           </p>
                         </div>
 
                         <div className="flex items-center gap-1.5 text-xs text-white/35">
                           <Clock3 className="size-3.5" />
-                          {formatActivityTime(activity.created_at)}
+                          {formatActivityTime(
+                            activity.created_at
+                          )}
                         </div>
                       </div>
 
@@ -288,7 +296,8 @@ export function EmployeePOS() {
                         </span>
 
                         <span className="text-sm font-semibold text-emerald-200">
-                          {activity.balance_before} → {activity.balance_after}
+                          {activity.balance_before} →{" "}
+                          {activity.balance_after}
                         </span>
                       </div>
 
@@ -309,8 +318,8 @@ export function EmployeePOS() {
                   </p>
 
                   <p className="mt-2 max-w-xs text-sm leading-6 text-white/35">
-                    Completed loyalty scans will appear here for the current
-                    employee and location.
+                    Completed loyalty scans will appear here for the
+                    current employee and location.
                   </p>
                 </div>
               )}

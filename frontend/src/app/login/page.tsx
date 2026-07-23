@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CreditCard } from "lucide-react"
 
-import { api } from "@/services/api"
 import { useAuth } from "@/hooks/useAuth"
+import { api } from "@/services/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,9 +33,14 @@ export default function LoginPage() {
         },
       })
 
-      login(response.data.access_token)
+      const currentUser = await login(response.data.access_token)
 
-      router.push("/customers")
+      if (currentUser.account_type === "employee") {
+        router.replace("/pos")
+        return
+      }
+
+      router.replace("/customers")
     } catch {
       setError("Invalid email or password.")
     } finally {
@@ -50,6 +55,7 @@ export default function LoginPage() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-black">
             <CreditCard className="h-5 w-5" />
           </div>
+
           <div>
             <p className="text-sm text-white/50">Loyalty SaaS</p>
             <h1 className="text-xl font-semibold">Sign in</h1>
@@ -58,9 +64,17 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="text-sm text-white/60">Email</label>
+            <label
+              htmlFor="email"
+              className="text-sm text-white/60"
+            >
+              Email
+            </label>
+
             <input
+              id="email"
               type="email"
+              autoComplete="email"
               className="mt-2 w-full rounded-2xl border border-white/10 bg-black px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-white/30"
               placeholder="owner@example.com"
               value={email}
@@ -70,9 +84,17 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="text-sm text-white/60">Password</label>
+            <label
+              htmlFor="password"
+              className="text-sm text-white/60"
+            >
+              Password
+            </label>
+
             <input
+              id="password"
               type="password"
+              autoComplete="current-password"
               className="mt-2 w-full rounded-2xl border border-white/10 bg-black px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-white/30"
               placeholder="••••••••"
               value={password}

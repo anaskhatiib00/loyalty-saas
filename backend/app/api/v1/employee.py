@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -6,6 +8,7 @@ from app.application.authorization.permissions import Permission
 from app.application.identity.current_business_context import (
     CurrentBusinessContext,
 )
+from app.core.settings import settings
 from app.db.database import get_db
 from app.schemas.employee import (
     EmployeeCreate,
@@ -29,7 +32,6 @@ from app.services.identity_invitation_service import (
     accept_identity_invitation_service,
     create_identity_invitation_service,
 )
-
 
 router = APIRouter(
     prefix="/employees",
@@ -71,11 +73,28 @@ def invite_employee(
         invitation_data=invitation_data,
     )
 
-    return {
+    response = {
         "invitation": result.invitation,
         "employee_id": result.invitation.employee_id,
         "delivery_status": "pending",
+        "development_invitation_token": None,
+        "development_accept_url": None,
     }
+
+    if settings.DEBUG:
+        query = urlencode(
+            {
+                "token": result.raw_token,
+            }
+        )
+
+        response["development_invitation_token"] = result.raw_token
+        response["development_accept_url"] = (
+            f"{settings.FRONTEND_URL.rstrip('/')}"
+            f"/employee/accept?{query}"
+        )
+
+    return response
 
 
 @router.post(

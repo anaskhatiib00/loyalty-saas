@@ -1,40 +1,39 @@
-import { Activity, Gift, Users, WalletCards } from "lucide-react"
+"use client"
 
-import { DashboardShell } from "@/components/layout/DashboardShell"
-import { QuickActions } from "@/components/dashboard/QuickActions"
-import { RecentActivity } from "@/components/dashboard/RecentActivity"
-import { StatCard } from "@/components/dashboard/StatCard"
-import {
-  customerService,
-  type Customer,
-} from "@/features/customers"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-export default function DashboardPage() {
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { useAuth } from "@/hooks/useAuth"
+
+function HomeRedirect() {
+  const router = useRouter()
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    if (user.account_type === "employee") {
+      router.replace("/pos")
+      return
+    }
+
+    router.replace("/customers")
+  }, [router, user])
+
   return (
-    <DashboardShell>
-      <div className="space-y-8 text-white">
-        <section className="max-w-3xl">
-          <p className="text-sm text-white/50">Good afternoon 👋</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-            Dashboard
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-white/50">
-            A simple command center for customers, rewards, wallet passes, and
-            loyalty activity.
-          </p>
-        </section>
+    <main className="flex min-h-screen items-center justify-center bg-black text-sm text-white/50">
+      Opening your workspace...
+    </main>
+  )
+}
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="Customers" value="0" change="+0 this week" icon={Users} />
-          <StatCard title="Rewards" value="0" change="+0 active" icon={Gift} />
-          <StatCard title="Activities" value="0" change="+0 today" icon={Activity} />
-          <StatCard title="Wallet Passes" value="0" change="+0 issued" icon={WalletCards} />
-        </section>
-
-        <QuickActions />
-
-        <RecentActivity />
-      </div>
-    </DashboardShell>
+export default function HomePage() {
+  return (
+    <ProtectedRoute>
+      <HomeRedirect />
+    </ProtectedRoute>
   )
 }

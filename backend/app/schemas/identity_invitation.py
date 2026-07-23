@@ -82,6 +82,8 @@ class IdentityInvitationCreatedResponse(BaseModel):
     invitation: IdentityInvitationResponse
     employee_id: int
     delivery_status: str = "pending"
+    development_invitation_token: str | None = None
+    development_accept_url: str | None = None
 
 
 class IdentityInvitationAcceptedResponse(BaseModel):
