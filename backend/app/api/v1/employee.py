@@ -31,6 +31,11 @@ from app.services.employee_service import (
 from app.services.identity_invitation_service import (
     accept_identity_invitation_service,
     create_identity_invitation_service,
+    preview_identity_invitation_service,
+
+)
+from app.schemas.identity_invitation_preview import (
+    IdentityInvitationPreviewResponse,
 )
 
 router = APIRouter(
@@ -95,6 +100,20 @@ def invite_employee(
         )
 
     return response
+
+
+@router.get(
+    "/invitations/preview",
+    response_model=IdentityInvitationPreviewResponse,
+)
+def preview_employee_invitation(
+    token: str,
+    db: Session = Depends(get_db),
+):
+    return preview_identity_invitation_service(
+        db,
+        token=token,
+    )
 
 
 @router.post(
