@@ -1,3 +1,29 @@
+export type POSBusinessContext = {
+  id: number
+  name: string
+}
+
+export type POSEmployeeContext = {
+  id: number
+  full_name: string
+  role: string
+}
+
+export type POSLocationContext = {
+  id: number
+  name: string
+  address: string
+  city: string | null
+  state: string | null
+  country: string | null
+}
+
+export type POSWorkspaceContext = {
+  business: POSBusinessContext
+  employee: POSEmployeeContext
+  location: POSLocationContext
+}
+
 export type POSScanRequest = {
   loyalty_card_identifier: string
 }

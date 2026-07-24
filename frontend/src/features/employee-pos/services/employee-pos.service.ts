@@ -4,9 +4,16 @@ import type {
   POSRecentActivityResponse,
   POSScanRequest,
   POSScanResponse,
+  POSWorkspaceContext,
 } from "../types/employee-pos"
 
 export const employeePOSService = {
+  async getWorkspaceContext(): Promise<POSWorkspaceContext> {
+    const response = await api.get<POSWorkspaceContext>("/pos/context")
+
+    return response.data
+  },
+
   async scanCard(data: POSScanRequest): Promise<POSScanResponse> {
     const response = await api.post<POSScanResponse>("/pos/scan", data)
 

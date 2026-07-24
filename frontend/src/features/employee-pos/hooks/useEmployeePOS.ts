@@ -1,95 +1,54 @@
 "use client"
 
-import { useCallback, useState } from "react"
-
-import { employeePOSService } from "../services/employee-pos.service"
-import type {
-  POSRecentActivityResponse,
-  POSScanResponse,
-} from "../types/employee-pos"
+import { usePOSCardScanner } from "./usePOSCardScanner"
+import { usePOSRecentActivity } from "./usePOSRecentActivity"
+import { usePOSWorkspace } from "./usePOSWorkspace"
 
 export function useEmployeePOS() {
-  const [manualCardInput, setManualCardInput] = useState("")
-  const [recentActivity, setRecentActivity] =
-    useState<POSRecentActivityResponse | null>(null)
-  const [scanResult, setScanResult] =
-    useState<POSScanResponse | null>(null)
+  const {
+    workspaceContext,
+    isLoadingContext,
+    isWorkspaceUnavailable,
+    contextError,
+  } = usePOSWorkspace()
 
-  const [isLoadingActivity, setIsLoadingActivity] = useState(true)
-  const [isScanning, setIsScanning] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    recentActivity,
+    isLoadingActivity,
+    activityError,
+    loadRecentActivity,
+  } = usePOSRecentActivity()
 
-  const loadRecentActivity = useCallback(async () => {
-    try {
-      setIsLoadingActivity(true)
-      setError(null)
-
-      const result =
-        await employeePOSService.getRecentActivity()
-
-      setRecentActivity(result)
-    } catch {
-      setError("Unable to load recent POS activity.")
-    } finally {
-      setIsLoadingActivity(false)
-    }
-  }, [])
-
-  const scanCard = useCallback(
-    async (identifierOverride?: string) => {
-      const identifier = (
-        identifierOverride ?? manualCardInput
-      ).trim()
-
-      if (!identifier) {
-        setScanResult(null)
-        setError("Scan or enter a loyalty card first.")
-        return
-      }
-
-      try {
-        setIsScanning(true)
-        setError(null)
-        setScanResult(null)
-
-        const result = await employeePOSService.scanCard({
-          loyalty_card_identifier: identifier,
-        })
-
-        setScanResult(result)
-        setManualCardInput("")
-
-        await loadRecentActivity()
-      } catch {
-        setScanResult(null)
-        setError("Unable to process this loyalty card.")
-      } finally {
-        setIsScanning(false)
-      }
-    },
-    [loadRecentActivity, manualCardInput]
-  )
-
-  const reset = useCallback(() => {
-    setManualCardInput("")
-    setScanResult(null)
-    setError(null)
-  }, [])
-
-  return {
+  const {
     manualCardInput,
     setManualCardInput,
+    scanResult,
+    isScanning,
+    scanError,
+    scanCard,
+    resetScan,
+  } = usePOSCardScanner()
 
+  const error = scanError ?? activityError
+
+  return {
+    workspaceContext,
     recentActivity,
     scanResult,
 
+    manualCardInput,
+    setManualCardInput,
+
+    isLoadingContext,
     isLoadingActivity,
     isScanning,
+    isWorkspaceUnavailable,
 
+    contextError,
     error,
 
     scanCard,
     loadRecentActivity,
-    reset,
+    reset: resetScan,
   }
 }
