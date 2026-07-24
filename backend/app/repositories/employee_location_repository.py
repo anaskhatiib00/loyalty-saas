@@ -139,6 +139,7 @@ def create_employee_location_assignment(
     location_id: int,
     assigned_by_user_id: int | None,
     is_primary: bool = False,
+    is_current: bool = False,
 ) -> EmployeeLocation:
     """
     Create an assignment without committing the surrounding transaction.
@@ -148,7 +149,7 @@ def create_employee_location_assignment(
         location_id=location_id,
         assigned_by_user_id=assigned_by_user_id,
         is_primary=is_primary,
-        is_current=False,
+        is_current=is_current,
         is_active=True,
     )
 

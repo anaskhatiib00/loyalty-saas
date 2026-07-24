@@ -1,8 +1,14 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.application.use_cases.loyalty_scan.resolve_employee_context import (
     resolve_employee_context,
 )
+from app.core.international import (
+    InvalidRegionalConfigurationError,
+    resolve_regional_configuration,
+)
+from app.core.time import resolve_business_day_range
 from app.models.loyalty_activity import LoyaltyActivity
 from app.models.user import User
 from app.repositories.loyalty_activity_repository import (
@@ -69,11 +75,38 @@ def get_pos_recent_activity_use_case(
         current_user=current_user,
     )
 
+    settings = employee_context.business.settings
+
+    if settings is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Business regional settings are not configured",
+        )
+
+    try:
+        regional_configuration = resolve_regional_configuration(
+            country_code=settings.default_country_code,
+            currency_override=settings.currency_override,
+            timezone_override=settings.timezone_override,
+            locale_override=settings.locale_override,
+        )
+    except InvalidRegionalConfigurationError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="Business regional settings are invalid",
+        ) from exc
+
+    business_day = resolve_business_day_range(
+        timezone_name=regional_configuration.timezone,
+    )
+
     activities = get_recent_activities_by_employee_id(
         db=db,
         business_id=employee_context.business.id,
         employee_id=employee_context.employee.id,
         location_id=employee_context.location.id,
+        start_at=business_day.start_at_utc,
+        end_at=business_day.end_at_utc,
         limit=limit,
     )
 

@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 
 from app.models.loyalty_activity import LoyaltyActivity
 
+from datetime import datetime
+
 
 def create_loyalty_activity(
     db: Session,
@@ -83,6 +85,8 @@ def get_recent_activities_by_employee_id(
     business_id: int,
     employee_id: int,
     location_id: int,
+    start_at: datetime,
+    end_at: datetime,
     limit: int = 20,
 ) -> list[LoyaltyActivity]:
     safe_limit = max(1, min(limit, 100))
@@ -95,6 +99,8 @@ def get_recent_activities_by_employee_id(
             LoyaltyActivity.location_id == location_id,
             LoyaltyActivity.source == "employee_pos",
             LoyaltyActivity.status == "completed",
+            LoyaltyActivity.created_at >= start_at,
+            LoyaltyActivity.created_at < end_at,
         )
         .order_by(
             LoyaltyActivity.created_at.desc(),

@@ -22,6 +22,9 @@ from app.repositories.identity_invitation_repository import (
 )
 from app.repositories.location_repository import get_location_by_id
 from app.repositories.user_repository import get_user_by_email
+from app.repositories.employee_location_repository import (
+    create_employee_location_assignment,
+)
 from app.schemas.identity_invitation import IdentityInvitationCreate
 
 
@@ -131,6 +134,16 @@ def create_identity_invitation(
             phone=invitation_data.phone,
             role=invitation_data.role,
         )
+
+        if invitation_data.location_id is not None:
+           create_employee_location_assignment(
+               db,
+               employee_id=employee.id,
+               location_id=invitation_data.location_id,
+               assigned_by_user_id=created_by_user_id,
+               is_primary=True,
+               is_current=True,
+            )
 
         invitation = create_identity_invitation_record(
             db,
